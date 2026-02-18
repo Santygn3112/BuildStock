@@ -5,24 +5,19 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.guillen.buildstock.data.repository.InventoryRepository
 import com.guillen.buildstock.databinding.FragmentHomeBinding
 import kotlinx.coroutines.launch
-import androidx.fragment.app.activityViewModels
-// 1. Para que entienda la magia de "by activityViewModels()"
-import androidx.fragment.app.activityViewModels
-
-// 2. Para que sepa qué es un "SharedCartViewModel" (ajusta la ruta si tu paquete es distinto)
-import com.guillen.buildstock.ui.cart.SharedCartViewModel
 
 class HomeFragment : Fragment() {
-    private val sharedCartViewModel: SharedCartViewModel by activityViewModels()
+
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
-    // Instanciamos el repositorio
+    // Instanciamos el repositorio para las estadísticas
     private val repository = InventoryRepository()
 
     override fun onCreateView(
@@ -37,7 +32,7 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         setupClickListeners()
-        loadStatistics() // Llamamos a la nueva función al cargar la pantalla
+        loadStatistics()
     }
 
     private fun loadStatistics() {
@@ -53,6 +48,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupClickListeners() {
+        // Enlazamos directamente con los IDs reales de tu XML
         binding.cardElectric.setOnClickListener {
             openCategory("Herramientas Eléctricas")
         }
@@ -66,7 +62,7 @@ class HomeFragment : Fragment() {
         }
 
         binding.cvSearch.setOnClickListener {
-            android.widget.Toast.makeText(requireContext(), "Buscador en construcción", android.widget.Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "Buscador en construcción", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -82,7 +78,7 @@ class HomeFragment : Fragment() {
         _binding = null
     }
 
-    // Un detalle de calidad: Refrescar los números si volvemos a esta pantalla
+    // Refrescar los números si volvemos a esta pantalla
     override fun onResume() {
         super.onResume()
         loadStatistics()

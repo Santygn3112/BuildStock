@@ -7,101 +7,110 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.google.firebase.auth.FirebaseAuth
 import com.guillen.buildstock.R
-import com.guillen.buildstock.data.model.Tool
+import com.guillen.buildstock.data.repository.InventoryRepository
+import com.guillen.buildstock.data.repository.AuthRepository
 import com.guillen.buildstock.databinding.FragmentCartBinding
-import androidx.fragment.app.activityViewModels
+import kotlinx.coroutines.launch
 
 class CartFragment : Fragment() {
-    // El "cerebro" compartido correcto
-    private val sharedCartViewModel: SharedCartViewModel by activityViewModels()
+
     private var _binding: FragmentCartBinding? = null
     private val binding get() = _binding!!
 
+    private val inventoryRepository = InventoryRepository()
+    private val authRepository = AuthRepository() // Para sacar los datos del usuario actual
     private lateinit var cartAdapter: CartAdapter
 
-    override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
-        savedInstanceState: Bundle?
-    ): View {
+    private var isRecogida = true // Estado del toggle
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentCartBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        setupRecyclerView()
+        setupToggleButtons()
 
-        try {
-            setupRecyclerView()
-            setupToggleButtons()
+        binding.btnConfirmTransaction.setOnClickListener {
+            confirmTransaction()
+        }
+    }
 
-            binding.btnConfirmTransaction.setOnClickListener {
-                val totalItems = cartAdapter.getCartItems().sumOf { it.quantity }
-                if (totalItems > 0) {
-                    Toast.makeText(requireContext(), "Confirmando $totalItems herramientas...", Toast.LENGTH_SHORT).show()
-                } else {
-                    Toast.makeText(requireContext(), "El carrito está vacío", Toast.LENGTH_SHORT).show()
-                }
+    private fun confirmTransaction() {
+        val items = CartManager.cartItems.value ?: emptyList()
+
+        if (items.isEmpty()) {
+            Toast.makeText(requireContext(), "El carrito está vacío", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            binding.btnConfirmTransaction.isEnabled = false
+
+            // 1. Obtenemos quién está operando (para la opción 1 de "Desnormalización")
+            val currentUserEmail = FirebaseAuth.getInstance().currentUser?.email ?: ""
+            val userProfile = authRepository.getAllUsers().find { it.email == currentUserEmail }
+
+            val userName = userProfile?.name ?: "Usuario Desconocido"
+            val userPhone = userProfile?.phone ?: "Sin teléfono"
+
+            // 2. Ejecutamos el lote en Firebase
+            val success = inventoryRepository.processTransaction(
+                items = items,
+                isRecogida = isRecogida,
+                userName = userName,
+                userPhone = userPhone
+            )
+
+            if (success) {
+                Toast.makeText(requireContext(), "¡Transacción realizada con éxito!", Toast.LENGTH_LONG).show()
+                CartManager.clearCart() // Vaciamos el Singleton
+            } else {
+                Toast.makeText(requireContext(), "Error al procesar. Revisa tu conexión.", Toast.LENGTH_LONG).show()
             }
-        } catch (e: Exception) {
-            // Si algo explota al cargar, lo capturamos aquí para que no se cierre la app
-            android.util.Log.e("CART_ERROR", "Error al cargar la vista", e)
-            Toast.makeText(requireContext(), "Error visual: Revisa tus colores en colors.xml", Toast.LENGTH_LONG).show()
+
+            binding.btnConfirmTransaction.isEnabled = true
         }
     }
 
     private fun setupRecyclerView() {
-        // Inicializamos el adaptador con una lista vacía por ahora
-        cartAdapter = CartAdapter(mutableListOf()) {
-            // Este bloque se ejecuta cuando sumamos, restamos o borramos en la tarjeta
-            updateTotals()
-            // Podríamos avisar al ViewModel de los cambios aquí más adelante
-        }
+        binding.rvCartItems.layoutManager = LinearLayoutManager(requireContext())
 
-        binding.rvCartItems.apply {
-            layoutManager = LinearLayoutManager(requireContext())
-            adapter = cartAdapter
-        }
-
-        // ¡AQUÍ ESTÁ LA MAGIA! Escuchamos al cerebro en tiempo real
-        sharedCartViewModel.cartItems.observe(viewLifecycleOwner) { items ->
-            // Si el ViewModel cambia, actualizamos el adaptador
-            cartAdapter = CartAdapter(items) {
-                updateTotals()
-                // Falta enlazar los botones +- con el ViewModel, lo haremos enseguida
-            }
+        CartManager.cartItems.observe(viewLifecycleOwner) { items ->
+            cartAdapter = CartAdapter(
+                cartList = items,
+                onQuantityChanged = { tool, newQty -> CartManager.updateQuantity(tool, newQty) },
+                onItemRemoved = { tool -> CartManager.removeFromCart(tool) }
+            )
             binding.rvCartItems.adapter = cartAdapter
             updateTotals()
         }
     }
 
     private fun setupToggleButtons() {
-        binding.toggleTransactionType.addOnButtonCheckedListener { group, checkedId, isChecked ->
+        binding.toggleTransactionType.addOnButtonCheckedListener { _, checkedId, isChecked ->
             if (isChecked) {
-                when (checkedId) {
-                    R.id.btnRecogida -> {
-                        binding.tvTransactionTypeLabel.text = "RECOGIDA"
-                        try {
-                            // Uso seguro de colores
-                            binding.tvTransactionTypeLabel.setTextColor(ContextCompat.getColor(requireContext(), R.color.brand_orange))
-                        } catch (e: Exception) { }
-                    }
-                    R.id.btnDevolucion -> {
-                        binding.tvTransactionTypeLabel.text = "DEVOLUCIÓN"
-                        try {
-                            // Uso seguro de colores
-                            binding.tvTransactionTypeLabel.setTextColor(ContextCompat.getColor(requireContext(), R.color.brand_green))
-                        } catch (e: Exception) { }
-                    }
+                isRecogida = checkedId == R.id.btnRecogida
+                if (isRecogida) {
+                    binding.tvTransactionTypeLabel.text = "RECOGIDA"
+                    binding.tvTransactionTypeLabel.setTextColor(ContextCompat.getColor(requireContext(), R.color.brand_orange))
+                } else {
+                    binding.tvTransactionTypeLabel.text = "DEVOLUCIÓN"
+                    binding.tvTransactionTypeLabel.setTextColor(ContextCompat.getColor(requireContext(), R.color.brand_green))
                 }
             }
         }
     }
 
     private fun updateTotals() {
-        val totalElements = cartAdapter.getCartItems().sumOf { it.quantity }
-        binding.tvTotalItems.text = totalElements.toString()
+        val total = CartManager.cartItems.value?.sumOf { it.quantity } ?: 0
+        binding.tvTotalItems.text = total.toString()
     }
 
     override fun onDestroyView() {

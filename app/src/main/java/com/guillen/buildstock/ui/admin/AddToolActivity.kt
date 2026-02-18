@@ -5,7 +5,6 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
-import com.guillen.buildstock.R
 import com.guillen.buildstock.data.model.Tool
 import com.guillen.buildstock.data.repository.InventoryRepository
 import com.guillen.buildstock.databinding.ActivityAddToolBinding
@@ -15,90 +14,99 @@ class AddToolActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityAddToolBinding
     private val repository = InventoryRepository()
-
-    // LA LÍNEA DEL CONFLICTO: Perfectamente escrita e inicializada a null
-    private var toolIdToEdit: String? = null
+    private var toolId: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityAddToolBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        setupToolbar()
-        setupCategorySpinner()
-        checkForEditMode()
-        setupSaveButton()
-    }
-
-    private fun setupToolbar() {
+        // Configurar el Toolbar
         setSupportActionBar(binding.toolbarAddTool)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         binding.toolbarAddTool.setNavigationOnClickListener { finish() }
-    }
 
-    private fun setupCategorySpinner() {
-        ArrayAdapter.createFromResource(
-            this,
-            R.array.tool_categories,
-            android.R.layout.simple_spinner_item
-        ).also { adapter ->
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-            binding.spinnerCategory.adapter = adapter
+        toolId = intent.getStringExtra("TOOL_ID")
+        setupSpinner()
+
+        if (toolId != null) {
+            binding.toolbarAddTool.title = "Editar Herramienta"
+            binding.btnSaveTool.text = "ACTUALIZAR HERRAMIENTA"
+            loadToolData(toolId!!)
         }
-    }
 
-    private fun checkForEditMode() {
-        toolIdToEdit = intent.getStringExtra("TOOL_ID")
-        if (toolIdToEdit != null) {
-            supportActionBar?.title = "Editar Herramienta"
-            binding.btnSaveTool.text = "Actualizar Herramienta"
-
-            binding.etName.setText(intent.getStringExtra("TOOL_NAME"))
-            binding.etBrandModel.setText(intent.getStringExtra("TOOL_BRAND"))
-            binding.etLocation.setText(intent.getStringExtra("TOOL_LOCATION"))
-            binding.etStock.setText(intent.getIntExtra("TOOL_STOCK", 0).toString())
-            binding.etDescription.setText(intent.getStringExtra("TOOL_DESC"))
-
-            val category = intent.getStringExtra("TOOL_CATEGORY")
-            val adapter = binding.spinnerCategory.adapter as ArrayAdapter<String>
-            val position = adapter.getPosition(category)
-            if (position >= 0) {
-                binding.spinnerCategory.setSelection(position)
-            }
-        }
-    }
-
-    private fun setupSaveButton() {
         binding.btnSaveTool.setOnClickListener {
-            if (binding.etName.text.isNullOrBlank() || binding.etStock.text.isNullOrBlank()) {
-                Toast.makeText(this, "Nombre y Stock son obligatorios", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
+            saveTool()
+        }
+    }
+
+    private fun setupSpinner() {
+        // Categorías exactas para tu Spinner
+        val categories = arrayOf("Herramientas Eléctricas", "Herramientas Manuales", "Consumibles", "Medición", "EPIS")
+        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, categories)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        binding.spinnerCategory.adapter = adapter
+    }
+
+    private fun loadToolData(id: String) {
+        lifecycleScope.launch {
+            val tool = repository.getToolById(id)
+            if (tool != null) {
+                binding.etName.setText(tool.name)
+                binding.etBrandModel.setText(tool.brandModel)
+                binding.etStock.setText(tool.stock.toString())
+                binding.etLocation.setText(tool.location)
+                binding.etDescription.setText(tool.description)
+
+                val categories = arrayOf("Herramientas Eléctricas", "Herramientas Manuales", "Consumibles", "Medición", "EPIS")
+                val categoryIndex = categories.indexOf(tool.category)
+                if (categoryIndex >= 0) {
+                    binding.spinnerCategory.setSelection(categoryIndex)
+                }
+            }
+        }
+    }
+
+    private fun saveTool() {
+        val name = binding.etName.text.toString().trim()
+        val brandModel = binding.etBrandModel.text.toString().trim()
+        val category = binding.spinnerCategory.selectedItem.toString()
+        val stockString = binding.etStock.text.toString().trim()
+        val location = binding.etLocation.text.toString().trim()
+        val description = binding.etDescription.text.toString().trim()
+
+        val stock = stockString.toIntOrNull() ?: 0
+
+        if (name.isEmpty()) {
+            binding.etName.error = "El nombre es obligatorio"
+            return
+        }
+
+        val tool = Tool(
+            id = toolId ?: "",
+            name = name,
+            brandModel = brandModel,
+            category = category,
+            stock = stock,
+            location = location,
+            description = description,
+            status = if (stock > 0) "disponible" else "en uso"
+        )
+
+        lifecycleScope.launch {
+            binding.btnSaveTool.isEnabled = false
+            val success = if (toolId == null) {
+                repository.addTool(tool)
+            } else {
+                repository.updateTool(tool)
             }
 
-            val tool = Tool(
-                id = toolIdToEdit ?: "",
-                name = binding.etName.text.toString(),
-                brandModel = binding.etBrandModel.text.toString(),
-                category = binding.spinnerCategory.selectedItem.toString(),
-                status = "disponible",
-                stock = binding.etStock.text.toString().toIntOrNull() ?: 0,
-                location = binding.etLocation.text.toString(),
-                description = binding.etDescription.text.toString()
-            )
-
-            lifecycleScope.launch {
-                val success = if (toolIdToEdit == null) {
-                    repository.addTool(tool)
-                } else {
-                    repository.updateTool(tool)
-                }
-
-                if (success) {
-                    Toast.makeText(this@AddToolActivity, "Guardado correctamente", Toast.LENGTH_SHORT).show()
-                    finish()
-                } else {
-                    Toast.makeText(this@AddToolActivity, "Error al guardar", Toast.LENGTH_SHORT).show()
-                }
+            if (success) {
+                Toast.makeText(this@AddToolActivity, "Operación realizada con éxito", Toast.LENGTH_SHORT).show()
+                finish()
+            } else {
+                Toast.makeText(this@AddToolActivity, "Error al guardar en Firebase", Toast.LENGTH_SHORT).show()
+                binding.btnSaveTool.isEnabled = true
             }
         }
     }

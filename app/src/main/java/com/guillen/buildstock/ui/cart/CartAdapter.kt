@@ -2,11 +2,11 @@ package com.guillen.buildstock.ui.cart
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
 import com.guillen.buildstock.data.model.Tool
 import com.guillen.buildstock.databinding.ItemCartToolBinding
 
-// 1. Mini-modelo temporal para juntar la herramienta con su cantidad en el carrito
 data class CartItem(
     val tool: Tool,
     var quantity: Int = 1
@@ -14,38 +14,33 @@ data class CartItem(
 
 class CartAdapter(
     private var cartList: MutableList<CartItem>,
-    private val onTotalChanged: () -> Unit // Aviso al Fragment para que recalcule el total
+    private val onQuantityChanged: (Tool, Int) -> Unit,
+    private val onItemRemoved: (Tool) -> Unit
 ) : RecyclerView.Adapter<CartAdapter.CartViewHolder>() {
 
     inner class CartViewHolder(val binding: ItemCartToolBinding) : RecyclerView.ViewHolder(binding.root) {
-        fun bind(item: CartItem, position: Int) {
-            // Asignamos el nombre y la cantidad actual
+        fun bind(item: CartItem) {
             binding.tvToolNameCart.text = item.tool.name
             binding.tvQuantity.text = item.quantity.toString()
 
-            // Lógica del botón SUMAR
             binding.btnPlus.setOnClickListener {
-                // Aquí en el futuro validaremos que no supere el Stock disponible
-                item.quantity++
-                binding.tvQuantity.text = item.quantity.toString()
-                onTotalChanged()
-            }
-
-            // Lógica del botón RESTAR
-            binding.btnMinus.setOnClickListener {
-                if (item.quantity > 1) {
-                    item.quantity--
-                    binding.tvQuantity.text = item.quantity.toString()
-                    onTotalChanged()
+                if (item.quantity < item.tool.stock) {
+                    // Avisamos al Manager de que queremos subir 1
+                    onQuantityChanged(item.tool, item.quantity + 1)
+                } else {
+                    Toast.makeText(binding.root.context, "Límite de stock: ${item.tool.stock} uds", Toast.LENGTH_SHORT).show()
                 }
             }
 
-            // Lógica del botón BORRAR
+            binding.btnMinus.setOnClickListener {
+                if (item.quantity > 1) {
+                    // Avisamos al Manager de que queremos bajar 1
+                    onQuantityChanged(item.tool, item.quantity - 1)
+                }
+            }
+
             binding.btnDelete.setOnClickListener {
-                cartList.removeAt(adapterPosition)
-                notifyItemRemoved(adapterPosition)
-                notifyItemRangeChanged(adapterPosition, cartList.size)
-                onTotalChanged()
+                onItemRemoved(item.tool)
             }
         }
     }
@@ -56,11 +51,10 @@ class CartAdapter(
     }
 
     override fun onBindViewHolder(holder: CartViewHolder, position: Int) {
-        holder.bind(cartList[position], position)
+        holder.bind(cartList[position])
     }
 
     override fun getItemCount(): Int = cartList.size
 
-    // Función para leer la lista actual desde fuera
     fun getCartItems(): List<CartItem> = cartList
 }

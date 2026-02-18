@@ -1,13 +1,14 @@
 package com.guillen.buildstock.data.model
 
 data class Tool(
-    val id: String = "",            // ID del documento de Firestore (ej: rANC6...)
+    val id: String = "",
     val name: String = "",
-    val brandModel: String = "",
+    val brandModel: String = "", // Para "Marca y Modelo"
     val category: String = "",
-    val status: String = "",
-    val imageUrl: String = "",
     val stock: Int = 0,
-    val location: String = "",      // Asegúrate de arreglar el typo en Firestore
-    val description: String = ""    // Asegúrate de arreglar el typo en Firestore
+    val location: String = "",    // Para "Ubicación Física"
+    val description: String = "", // Para "Descripción o notas"
+    val status: String = "disponible",
+    val lastUser: String = "",
+    val lastPhone: String = ""
 )

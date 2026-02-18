@@ -14,7 +14,7 @@ class ToolAdapter(
     private val onAddToCartClick: (Tool) -> Unit // Nuevo listener para el botón del carrito
 ) : RecyclerView.Adapter<ToolAdapter.ToolViewHolder>() {
 
-    
+
 
     class ToolViewHolder(val binding: ItemToolBinding) : RecyclerView.ViewHolder(binding.root)
 
