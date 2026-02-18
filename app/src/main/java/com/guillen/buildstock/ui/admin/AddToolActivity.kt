@@ -21,7 +21,6 @@ class AddToolActivity : AppCompatActivity() {
         binding = ActivityAddToolBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Configurar el Toolbar
         setSupportActionBar(binding.toolbarAddTool)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         binding.toolbarAddTool.setNavigationOnClickListener { finish() }
@@ -41,7 +40,6 @@ class AddToolActivity : AppCompatActivity() {
     }
 
     private fun setupSpinner() {
-        // Categorías exactas para tu Spinner
         val categories = arrayOf("Herramientas Eléctricas", "Herramientas Manuales", "Consumibles", "Medición", "EPIS")
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, categories)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
@@ -83,7 +81,7 @@ class AddToolActivity : AppCompatActivity() {
         }
 
         val tool = Tool(
-            id = toolId ?: "",
+            id = toolId ?: "", // CORREGIDO
             name = name,
             brandModel = brandModel,
             category = category,

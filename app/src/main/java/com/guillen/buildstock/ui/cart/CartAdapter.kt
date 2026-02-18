@@ -1,5 +1,6 @@
 package com.guillen.buildstock.ui.cart
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
@@ -25,7 +26,6 @@ class CartAdapter(
 
             binding.btnPlus.setOnClickListener {
                 if (item.quantity < item.tool.stock) {
-                    // Avisamos al Manager de que queremos subir 1
                     onQuantityChanged(item.tool, item.quantity + 1)
                 } else {
                     Toast.makeText(binding.root.context, "Límite de stock: ${item.tool.stock} uds", Toast.LENGTH_SHORT).show()
@@ -34,7 +34,6 @@ class CartAdapter(
 
             binding.btnMinus.setOnClickListener {
                 if (item.quantity > 1) {
-                    // Avisamos al Manager de que queremos bajar 1
                     onQuantityChanged(item.tool, item.quantity - 1)
                 }
             }
@@ -56,5 +55,29 @@ class CartAdapter(
 
     override fun getItemCount(): Int = cartList.size
 
-    fun getCartItems(): List<CartItem> = cartList
+    fun getCartList(): List<CartItem> = cartList
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun updateList(newList: List<CartItem>) {
+        cartList.clear()
+        cartList.addAll(newList)
+        notifyDataSetChanged()
+    }
+
+    fun updateQuantity(tool: Tool, newQuantity: Int) {
+        val item = cartList.find { it.tool.id == tool.id }
+        item?.let {
+            it.quantity = newQuantity
+            notifyItemChanged(cartList.indexOf(it))
+        }
+    }
+
+    fun removeItem(tool: Tool) {
+        val item = cartList.find { it.tool.id == tool.id }
+        item?.let {
+            val position = cartList.indexOf(it)
+            cartList.removeAt(position)
+            notifyItemRemoved(position)
+        }
+    }
 }
