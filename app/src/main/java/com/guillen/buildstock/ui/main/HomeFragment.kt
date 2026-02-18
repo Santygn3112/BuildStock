@@ -1,0 +1,90 @@
+package com.guillen.buildstock.ui.main
+
+import android.content.Intent
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import com.guillen.buildstock.data.repository.InventoryRepository
+import com.guillen.buildstock.databinding.FragmentHomeBinding
+import kotlinx.coroutines.launch
+import androidx.fragment.app.activityViewModels
+// 1. Para que entienda la magia de "by activityViewModels()"
+import androidx.fragment.app.activityViewModels
+
+// 2. Para que sepa qué es un "SharedCartViewModel" (ajusta la ruta si tu paquete es distinto)
+import com.guillen.buildstock.ui.cart.SharedCartViewModel
+
+class HomeFragment : Fragment() {
+    private val sharedCartViewModel: SharedCartViewModel by activityViewModels()
+    private var _binding: FragmentHomeBinding? = null
+    private val binding get() = _binding!!
+
+    // Instanciamos el repositorio
+    private val repository = InventoryRepository()
+
+    override fun onCreateView(
+        inflater: LayoutInflater, container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentHomeBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        setupClickListeners()
+        loadStatistics() // Llamamos a la nueva función al cargar la pantalla
+    }
+
+    private fun loadStatistics() {
+        lifecycleScope.launch {
+            // Pedimos los conteos exactos a Firebase
+            val availableCount = repository.getToolsCountByStatus("disponible")
+            val inUseCount = repository.getToolsCountByStatus("en uso")
+
+            // Actualizamos la interfaz gráfica
+            binding.tvAvailableCount.text = availableCount.toString()
+            binding.tvInUseCount.text = inUseCount.toString()
+        }
+    }
+
+    private fun setupClickListeners() {
+        binding.cardElectric.setOnClickListener {
+            openCategory("Herramientas Eléctricas")
+        }
+
+        binding.cardManual.setOnClickListener {
+            openCategory("Herramientas Manuales")
+        }
+
+        binding.cardConsumables.setOnClickListener {
+            openCategory("Consumibles")
+        }
+
+        binding.cvSearch.setOnClickListener {
+            android.widget.Toast.makeText(requireContext(), "Buscador en construcción", android.widget.Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun openCategory(categoryName: String) {
+        val intent = Intent(requireContext(), CategoryDetailActivity::class.java).apply {
+            putExtra("CATEGORY_NAME", categoryName)
+        }
+        startActivity(intent)
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+    // Un detalle de calidad: Refrescar los números si volvemos a esta pantalla
+    override fun onResume() {
+        super.onResume()
+        loadStatistics()
+    }
+}

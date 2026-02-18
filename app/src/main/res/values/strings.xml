@@ -1,0 +1,50 @@
+<resources>
+    <string name="app_name">BuildStock</string>
+    <string name="login_subtitle">Gestión de Inventario</string>
+    <string name="hint_user">Usuario</string>
+    <string name="hint_password">Contraseña</string>
+    <string name="btn_enter">ENTRAR</string>
+    <string name="error_empty_fields">Por favor, rellena todos los campos</string>
+    <string name="category_prefix">Categoría: %1$s</string>
+    <string name="status_label">Estado:</string>
+    <string name="status_available">Disponible</string>
+    <string name="status_loaned">En uso / Prestado</string>
+    <string name="dummy_tool_name">Nombre de Herramienta</string>
+    <string name="dummy_tool_desc">Descripción breve de la herramienta y sus especificaciones técnicas.</string>
+    <string name="welcome_message">Hola, %1$s</string>
+    <string name="hint_tool_name">Nombre de la herramienta</string>
+    <string name="hint_category">Categoría (Ej: Eléctrica, Manual)</string>
+    <string name="hint_description">Descripción técnica y estado</string>
+    <string name="btn_save">Guardar en Inventario</string>
+    <string name="label_description">Descripción técnica</string>
+    <string-array name="tool_categories">
+        <item>Herramientas Eléctricas</item>
+        <item>Herramientas Manuales</item>
+        <item>Consumibles</item>
+    </string-array>
+    <string name="title_home">Inicio</string>
+    <string name="title_cart">Carrito</string>
+    <string name="title_profile">Perfil</string>
+    <string name="hint_category_select">Selecciona una categoría</string>
+    <string name="search_hint">Buscar herramienta o materia</string>
+    <string name="header_categories">CATEGORÍAS</string>
+    <string name="cat_electric">Herramientas\nEléctricas</string>
+    <string name="cat_manual">Herramientas\nManuales</string>
+    <string name="cat_consumables">Consumibles</string>
+    <string name="stat_in_use">EN USO</string>
+    <string name="stat_available">DISPONIBLES</string>
+    <string name="profile_tools_assigned">Herramientas asignadas</string>
+    <string name="profile_moves_today">Movimientos hoy</string>
+    <string name="btn_logout">CERRAR SESIÓN</string>
+    <string name="default_avatar">--</string>
+    <string name="default_role_location">Cargando…</string>
+    <string name="default_counter">0</string>
+    <string name="btn_admin_panel">PANEL DE ADMINISTRACIÓN</string>
+    <string name="title_admin_panel">Gestión de Inventario</string>
+    <string name="btn_add_new_tool">Añadir Nueva Herramienta</string>
+    <string name="admin_menu_inventory">Gestión de Inventario</string>
+    <string name="admin_menu_inventory_desc">Ver todo el catálogo y registrar nuevas herramientas</string>
+    <string name="admin_menu_users">Gestión de Usuarios</string>
+    <string name="admin_menu_users_desc">Ver operarios, roles y estado de cuentas</string>
+    <string name="fab_add_tool">Añadir</string>
+</resources>
