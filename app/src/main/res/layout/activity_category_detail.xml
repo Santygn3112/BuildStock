@@ -10,14 +10,16 @@
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="100dp"
         android:backgroundTint="@color/brand_navy">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbarCategory"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
+            android:layout_height="match_parent"
+            android:paddingTop="22dp"
             app:titleTextColor="@android:color/white"
+            app:titleTextAppearance="@style/TextAppearance.Material3.HeadlineMedium"
             app:subtitleTextColor="@android:color/darker_gray"
             app:navigationIconTint="@android:color/white"
             tools:title="Herramientas Eléctricas"

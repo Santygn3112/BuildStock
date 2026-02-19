@@ -40,6 +40,10 @@
         <activity
             android:name=".ui.main.RecentMovementsActivity"
             android:exported="false" />
+        <activity
+            android:name=".ui.main.SearchActivity"
+            android:exported="false"
+            android:windowSoftInputMode="stateVisible" />
     </application>
 
 </manifest>

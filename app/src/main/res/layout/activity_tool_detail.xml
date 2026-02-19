@@ -10,15 +10,17 @@
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/appBarLayout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="100dp"
         android:backgroundTint="@color/brand_navy"
         app:layout_constraintTop_toTopOf="parent">
 
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbarToolDetail"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
+            android:layout_height="match_parent"
+            android:paddingTop="22dp"
             app:title="Detalle de Herramienta"
+            app:titleTextAppearance="@style/TextAppearance.Material3.HeadlineMedium"
             app:titleTextColor="@android:color/white"
             app:navigationIconTint="@android:color/white" />
     </com.google.android.material.appbar.AppBarLayout>

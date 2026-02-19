@@ -3,15 +3,24 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:background="@color/bg_light_gray">
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/toolbarAddUser"
+    <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
-        app:title="Nuevo Usuario"
-        app:titleTextColor="@android:color/white" />
+        android:layout_height="100dp"
+        android:backgroundTint="@color/brand_navy">
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbarAddUser"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingTop="22dp"
+            android:background="@color/brand_navy"
+            app:title="Nuevo Usuario"
+            app:titleTextAppearance="@style/TextAppearance.Material3.HeadlineMedium"
+            app:titleTextColor="@android:color/white"
+            app:navigationIconTint="@android:color/white"/>
+    </com.google.android.material.appbar.AppBarLayout>
 
     <ScrollView
         android:layout_width="match_parent"
@@ -21,7 +30,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="16dp">
+            android:padding="24dp">
 
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
@@ -30,76 +39,83 @@
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etUserName"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="64dp" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="16dp"
                 android:hint="Correo Electrónico">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etUserEmail"
                     android:inputType="textEmailAddress"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="64dp" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="16dp"
                 android:hint="Teléfono">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etUserPhone"
                     android:inputType="phone"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="64dp" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <com.google.android.material.textfield.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
+                android:layout_marginTop="16dp"
                 android:hint="Contraseña Provisional">
                 <com.google.android.material.textfield.TextInputEditText
                     android:id="@+id/etUserPassword"
                     android:inputType="textPassword"
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content" />
+                    android:layout_height="64dp" />
             </com.google.android.material.textfield.TextInputLayout>
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="24dp"
                 android:text="Rol del Usuario:"
+                android:textSize="16sp"
                 android:textStyle="bold" />
 
             <RadioGroup
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:layout_marginTop="8dp">
                 <RadioButton
                     android:id="@+id/rbOperario"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="Operario"
+                    android:textSize="16sp"
                     android:checked="true" />
                 <RadioButton
                     android:id="@+id/rbAdmin"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="16dp"
+                    android:layout_marginStart="24dp"
+                    android:textSize="16sp"
                     android:text="Administrador" />
             </RadioGroup>
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnCreateUser"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:layout_marginTop="24dp"
-                android:text="CREAR USUARIO" />
+                android:layout_height="72dp"
+                android:layout_marginTop="40dp"
+                android:text="CREAR USUARIO"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                app:cornerRadius="16dp"/>
 
         </LinearLayout>
     </ScrollView>

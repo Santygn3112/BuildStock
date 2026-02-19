@@ -48,6 +48,7 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+    implementation("com.github.bumptech.glide:glide:5.0.5")
     implementation(libs.androidx.fragment.ktx)
 
     // FIREBASE (Usando los nombres del TOML de arriba)

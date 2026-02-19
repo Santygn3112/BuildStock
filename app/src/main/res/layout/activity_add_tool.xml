@@ -9,13 +9,15 @@
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="100dp"
         android:backgroundTint="@color/brand_navy">
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbarAddTool"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
+            android:layout_height="match_parent"
+            android:paddingTop="22dp"
             app:title="Nueva Herramienta"
+            app:titleTextAppearance="@style/TextAppearance.Material3.HeadlineMedium"
             app:titleTextColor="@android:color/white"
             app:navigationIconTint="@android:color/white"/>
     </com.google.android.material.appbar.AppBarLayout>
@@ -91,12 +93,13 @@
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnSaveTool"
                 android:layout_width="match_parent"
-                android:layout_height="56dp"
-                android:layout_marginTop="32dp"
+                android:layout_height="64dp"
+                android:layout_marginTop="40dp"
                 android:text="GUARDAR EN INVENTARIO"
+                android:textSize="16sp"
                 android:textStyle="bold"
                 android:backgroundTint="@color/brand_orange"
-                app:cornerRadius="12dp" />
+                app:cornerRadius="16dp" />
 
         </LinearLayout>
     </ScrollView>

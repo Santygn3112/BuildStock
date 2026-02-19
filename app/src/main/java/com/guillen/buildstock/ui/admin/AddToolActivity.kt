@@ -5,6 +5,7 @@ import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.guillen.buildstock.R
 import com.guillen.buildstock.data.model.Tool
 import com.guillen.buildstock.data.repository.InventoryRepository
 import com.guillen.buildstock.databinding.ActivityAddToolBinding
@@ -15,7 +16,7 @@ class AddToolActivity : AppCompatActivity() {
     private lateinit var binding: ActivityAddToolBinding
     private val repository = InventoryRepository()
     private var toolId: String? = null
-    // Guardamos el estado actual por si estamos editando
+
     private var currentStatus: String = "disponible"
     private var currentUserId: String = ""
     private var currentUserName: String = ""
@@ -44,7 +45,7 @@ class AddToolActivity : AppCompatActivity() {
     }
 
     private fun setupSpinner() {
-        val categories = arrayOf("Herramientas Eléctricas", "Herramientas Manuales", "Consumibles", "Medición", "EPIS")
+        val categories = resources.getStringArray(R.array.tool_categories)
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, categories)
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.spinnerCategory.adapter = adapter
@@ -59,12 +60,12 @@ class AddToolActivity : AppCompatActivity() {
                 binding.etLocation.setText(tool.location)
                 binding.etDescription.setText(tool.description)
 
-                // Preservamos el estado del tracking para no perderlo al editar
                 currentStatus = tool.status
                 currentUserId = tool.currentUserId
                 currentUserName = tool.currentUserName
 
-                val categories = arrayOf("Herramientas Eléctricas", "Herramientas Manuales", "Consumibles", "Medición", "EPIS")
+                // Sincronizamos la selección del spinner con las categorías oficiales
+                val categories = resources.getStringArray(R.array.tool_categories)
                 val categoryIndex = categories.indexOf(tool.category)
                 if (categoryIndex >= 0) {
                     binding.spinnerCategory.setSelection(categoryIndex)
@@ -85,7 +86,6 @@ class AddToolActivity : AppCompatActivity() {
             return
         }
 
-        // Creamos el objeto con los nuevos campos de tracking
         val tool = Tool(
             id = toolId ?: "",
             name = name,

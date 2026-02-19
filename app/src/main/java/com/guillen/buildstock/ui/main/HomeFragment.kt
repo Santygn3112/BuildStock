@@ -62,7 +62,9 @@ class HomeFragment : Fragment() {
         }
 
         binding.cvSearch.setOnClickListener {
-            Toast.makeText(requireContext(), "Buscador en construcción", Toast.LENGTH_SHORT).show()
+            // Abrimos el nuevo buscador
+            val intent = Intent(requireContext(), SearchActivity::class.java)
+            startActivity(intent)
         }
     }
 

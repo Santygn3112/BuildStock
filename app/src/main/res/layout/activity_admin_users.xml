@@ -9,13 +9,15 @@
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="100dp"
         android:backgroundTint="@color/brand_navy">
         <com.google.android.material.appbar.MaterialToolbar
             android:id="@+id/toolbarAdminUsers"
             android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
+            android:layout_height="match_parent"
+            android:paddingTop="22dp"
             app:title="@string/admin_menu_users"
+            app:titleTextAppearance="@style/TextAppearance.Material3.HeadlineMedium"
             app:titleTextColor="@android:color/white"
             app:navigationIconTint="@android:color/white"/>
     </com.google.android.material.appbar.AppBarLayout>

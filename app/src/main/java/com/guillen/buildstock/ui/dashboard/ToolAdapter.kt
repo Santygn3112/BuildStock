@@ -5,6 +5,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.guillen.buildstock.R
 import com.guillen.buildstock.data.model.Tool
 import com.guillen.buildstock.databinding.ItemToolBinding
@@ -33,6 +34,14 @@ class ToolAdapter(
 
             // Lógica de estado actualizada (Sin cantidades)
             val isDisponible = tool.status.lowercase() == "disponible"
+
+            // CARGA DE IMAGEN CON GLIDE
+            com.bumptech.glide.Glide.with(context)
+                .load(tool.imageUrl)
+                .placeholder(android.R.drawable.ic_menu_gallery) // Imagen mientras carga
+                .error(android.R.drawable.ic_menu_report_image)   // Imagen si el link está roto
+                .centerCrop()
+                .into(ivToolImage)
 
             if (isDisponible) {
                 tvToolStatus.text = "Disponible"
