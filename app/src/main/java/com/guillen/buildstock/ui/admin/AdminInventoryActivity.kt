@@ -25,7 +25,6 @@ class AdminInventoryActivity : AppCompatActivity() {
         setupToolbar()
         setupRecyclerView()
 
-        // ID corregido: btnAddNewToolTop
         binding.btnAddNewToolTop.setOnClickListener {
             startActivity(Intent(this, AddToolActivity::class.java))
         }
@@ -37,7 +36,7 @@ class AdminInventoryActivity : AppCompatActivity() {
     }
 
     private fun setupToolbar() {
-        setSupportActionBar(binding.toolbarAdminInv) // ID corregido: toolbarAdminInv
+        setSupportActionBar(binding.toolbarAdminInv)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         binding.toolbarAdminInv.setNavigationOnClickListener { finish() }
     }
@@ -55,13 +54,12 @@ class AdminInventoryActivity : AppCompatActivity() {
                 deleteTool(tool.id)
             }
         )
-        // ID corregido: rvAdminTools
         binding.rvAdminTools.layoutManager = LinearLayoutManager(this)
         binding.rvAdminTools.adapter = adapter
     }
 
     private fun loadInventory() {
-        binding.progressBar.visibility = View.VISIBLE // Ahora el ID existe en el XML
+        binding.progressBar.visibility = View.VISIBLE
         lifecycleScope.launch {
             val tools = repository.getToolsList()
             adapter.updateList(tools)
@@ -70,6 +68,7 @@ class AdminInventoryActivity : AppCompatActivity() {
     }
 
     private fun deleteTool(id: String) {
+        if (id.isEmpty()) return
         lifecycleScope.launch {
             val success = repository.deleteTool(id)
             if (success) {

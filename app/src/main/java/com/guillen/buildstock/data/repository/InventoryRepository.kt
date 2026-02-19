@@ -1,19 +1,18 @@
 package com.guillen.buildstock.data.repository
 
 import android.util.Log
-import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
-import com.guillen.buildstock.data.model.Loan
+import com.google.firebase.firestore.Query
+import com.guillen.buildstock.data.model.Movement
 import com.guillen.buildstock.data.model.Tool
-import com.guillen.buildstock.ui.cart.CartItem
 import kotlinx.coroutines.tasks.await
 
 class InventoryRepository {
     private val db = FirebaseFirestore.getInstance()
     private val toolsCollection = db.collection("tools")
-    private val loansCollection = db.collection("loans")
+    private val movementsCollection = db.collection("movements")
 
-    // --- FUNCIONES DE GESTIÓN DE HERRAMIENTAS (Restauradas y Completas) ---
+    // --- GESTIÓN DE HERRAMIENTAS (CRUD) ---
 
     suspend fun getToolById(id: String): Tool? {
         return try {
@@ -28,7 +27,6 @@ class InventoryRepository {
     suspend fun addTool(tool: Tool): Boolean {
         return try {
             toolsCollection.add(tool).await()
-            Log.d("FIREBASE_MONITOR", "addTool: Éxito para ${tool.name}")
             true
         } catch (e: Exception) {
             Log.e("FIREBASE_MONITOR", "Error en addTool: ${e.message}", e)
@@ -38,28 +36,27 @@ class InventoryRepository {
 
     suspend fun updateTool(tool: Tool): Boolean {
         return try {
-            if (tool.id.isEmpty()) {
-                throw IllegalArgumentException("El ID de la herramienta no puede estar vacío para actualizar.")
-            }
+            if (tool.id.isEmpty()) return false
             toolsCollection.document(tool.id).set(tool).await()
-            Log.d("FIREBASE_MONITOR", "updateTool: Éxito para ${tool.name}")
             true
         } catch (e: Exception) {
             Log.e("FIREBASE_MONITOR", "Error en updateTool: ${e.message}", e)
             false
         }
     }
-    
+
     suspend fun deleteTool(id: String): Boolean {
         return try {
+            if (id.isEmpty()) return false
             toolsCollection.document(id).delete().await()
-            Log.d("FIREBASE_MONITOR", "deleteTool: Éxito para el ID $id")
             true
         } catch (e: Exception) {
             Log.e("FIREBASE_MONITOR", "Error en deleteTool: ${e.message}", e)
             false
         }
     }
+
+    // --- CONSULTAS ---
 
     suspend fun getToolsCountByStatus(status: String): Int {
         return try {
@@ -91,36 +88,47 @@ class InventoryRepository {
         }
     }
 
-    // --- LÓGICA DE TRANSACCIONES Y PRÉSTAMOS ---
-
-    suspend fun getActiveLoansByUser(userName: String): List<Loan> {
+    // NUEVO: Obtener todas las herramientas que tiene un usuario ahora mismo (Para Devolución y Perfil)
+    suspend fun getToolsByUserId(userId: String): List<Tool> {
         return try {
-            val snapshot = loansCollection.whereEqualTo("userName", userName).get().await()
-            snapshot.toObjects(Loan::class.java)
+            val snapshot = toolsCollection.whereEqualTo("currentUserId", userId).get().await()
+            snapshot.toObjects(Tool::class.java)
         } catch (e: Exception) {
-            Log.e("FIREBASE_MONITOR", "Error en getActiveLoansByUser: ${e.message}", e)
+            Log.e("FIREBASE_MONITOR", "Error en getToolsByUserId: ${e.message}", e)
             emptyList()
         }
     }
 
-    suspend fun processPickupTransaction(items: List<CartItem>, userId: String, userName: String): Boolean {
-        return try {
-            val batch = db.batch()
-            for (item in items) {
-                val toolRef = toolsCollection.document(item.tool.id)
-                val stockChange = -item.quantity.toLong()
-                batch.update(toolRef, "stock", FieldValue.increment(stockChange))
+    // --- LÓGICA DE TRANSACCIONES ---
 
-                val loanRef = loansCollection.document()
-                val newLoan = Loan(
-                    id = loanRef.id,
-                    toolId = item.tool.id,
-                    toolName = item.tool.name,
+    suspend fun processPickupTransaction(tools: List<Tool>, userId: String, userName: String): Boolean {
+        return try {
+            if (userId.isEmpty() || tools.isEmpty()) return false
+            val batch = db.batch()
+
+            for (tool in tools) {
+                if (tool.id.isEmpty()) continue
+                val toolRef = toolsCollection.document(tool.id)
+
+                // 1. Asignamos la herramienta al operario
+                batch.update(toolRef, mapOf(
+                    "status" to "en uso",
+                    "currentUserId" to userId,
+                    "currentUserName" to userName
+                ))
+
+                // 2. Guardamos el registro en el historial
+                val movementRef = movementsCollection.document()
+                val movement = Movement(
+                    id = movementRef.id,
+                    toolId = tool.id,
+                    toolName = tool.name,
                     userId = userId,
                     userName = userName,
-                    quantity = item.quantity
+                    type = "RECOGIDA",
+                    timestamp = System.currentTimeMillis()
                 )
-                batch.set(loanRef, newLoan)
+                batch.set(movementRef, movement)
             }
             batch.commit().await()
             true
@@ -130,22 +138,55 @@ class InventoryRepository {
         }
     }
 
-    suspend fun processReturnTransaction(loans: List<Loan>): Boolean {
+    suspend fun processReturnTransaction(tools: List<Tool>, userId: String, userName: String): Boolean {
         return try {
+            if (userId.isEmpty() || tools.isEmpty()) return false
             val batch = db.batch()
-            for (loan in loans) {
-                val toolRef = toolsCollection.document(loan.toolId)
-                val stockChange = loan.quantity.toLong()
-                batch.update(toolRef, "stock", FieldValue.increment(stockChange))
 
-                val loanRef = loansCollection.document(loan.id)
-                batch.delete(loanRef)
+            for (tool in tools) {
+                if (tool.id.isEmpty()) continue
+                val toolRef = toolsCollection.document(tool.id)
+
+                // 1. Liberamos la herramienta devolviéndola al almacén
+                batch.update(toolRef, mapOf(
+                    "status" to "disponible",
+                    "currentUserId" to "",
+                    "currentUserName" to ""
+                ))
+
+                // 2. Guardamos el registro en el historial
+                val movementRef = movementsCollection.document()
+                val movement = Movement(
+                    id = movementRef.id,
+                    toolId = tool.id,
+                    toolName = tool.name,
+                    userId = userId,
+                    userName = userName,
+                    type = "DEVOLUCION",
+                    timestamp = System.currentTimeMillis()
+                )
+                batch.set(movementRef, movement)
             }
             batch.commit().await()
             true
         } catch (e: Exception) {
             Log.e("FIREBASE_MONITOR", "Fallo en processReturnTransaction: ${e.message}", e)
             false
+        }
+    }
+
+    // NUEVO: Para la sección de "Últimos Movimientos"
+    suspend fun getRecentMovements(limit: Long = 10): List<Movement> {
+        return try {
+            val snapshot = movementsCollection
+                .orderBy("timestamp", Query.Direction.DESCENDING)
+                .limit(limit)
+                .get()
+                .await()
+            snapshot.toObjects(Movement::class.java)
+        } catch (e: Exception) {
+            Log.e("FIREBASE_MONITOR", "Error en getRecentMovements: ${e.message}", e)
+            emptyList()
         }
     }
 }

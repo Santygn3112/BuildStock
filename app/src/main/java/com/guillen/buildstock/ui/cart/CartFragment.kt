@@ -10,7 +10,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.guillen.buildstock.R
-import com.guillen.buildstock.data.model.Loan
 import com.guillen.buildstock.data.model.Tool
 import com.guillen.buildstock.data.repository.AuthRepository
 import com.guillen.buildstock.data.repository.InventoryRepository
@@ -27,7 +26,7 @@ class CartFragment : Fragment() {
     private lateinit var cartAdapter: CartAdapter
 
     private var isRecogida = true
-    private var currentUserLoans: List<Loan> = emptyList() // Guardar préstamos originales
+    private var toolsToReturn: MutableList<Tool> = mutableListOf()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentCartBinding.inflate(inflater, container, false)
@@ -38,7 +37,7 @@ class CartFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerView()
         setupToggleButtons()
-        loadCartManagerItems() // Carga inicial
+        loadPickupItems()
     }
 
     private fun setupToggleButtons() {
@@ -48,41 +47,34 @@ class CartFragment : Fragment() {
                 if (isRecogida) {
                     binding.tvTransactionTypeLabel.text = "RECOGIDA"
                     binding.tvTransactionTypeLabel.setTextColor(ContextCompat.getColor(requireContext(), R.color.brand_orange))
-                    loadCartManagerItems()
+                    loadPickupItems()
                 } else {
                     binding.tvTransactionTypeLabel.text = "DEVOLUCIÓN"
                     binding.tvTransactionTypeLabel.setTextColor(ContextCompat.getColor(requireContext(), R.color.brand_green))
-                    loadUserLoans()
+                    loadReturnItems()
                 }
             }
         }
     }
 
-    private fun loadCartManagerItems() {
+    private fun loadPickupItems() {
         CartManager.cartItems.observe(viewLifecycleOwner) { items ->
-            cartAdapter.updateList(items)
-            updateTotals()
+            if (isRecogida) {
+                cartAdapter.updateList(items)
+                updateTotals(items.size)
+            }
         }
     }
 
-    private fun loadUserLoans() {
+    private fun loadReturnItems() {
         viewLifecycleOwner.lifecycleScope.launch {
-            val currentUser = authRepository.getUserProfile() // CORREGIDO
+            val currentUser = authRepository.getUserProfile()
             if (currentUser != null) {
-                currentUserLoans = inventoryRepository.getActiveLoansByUser(currentUser.name)
-                // Mapeamos Loan a CartItem para que el adapter funcione sin cambios
-                val itemsForAdapter = currentUserLoans.map { loan ->
-                    CartItem(
-                        tool = Tool(id = loan.toolId, name = loan.toolName), // Tool simplificado para UI
-                        quantity = loan.quantity
-                    )
-                }
-                cartAdapter.updateList(itemsForAdapter)
-                updateTotals()
+                toolsToReturn = inventoryRepository.getToolsByUserId(currentUser.id).toMutableList()
+                cartAdapter.updateList(toolsToReturn)
+                updateTotals(toolsToReturn.size)
             } else {
-                Toast.makeText(requireContext(), "Error: Usuario no identificado.", Toast.LENGTH_SHORT).show()
-                cartAdapter.updateList(emptyList())
-                updateTotals()
+                Toast.makeText(requireContext(), "Error: Usuario no identificado", Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -90,10 +82,10 @@ class CartFragment : Fragment() {
     private fun confirmTransaction() {
         viewLifecycleOwner.lifecycleScope.launch {
             binding.btnConfirmTransaction.isEnabled = false
-            val currentUser = authRepository.getUserProfile() // CORREGIDO
+            val currentUser = authRepository.getUserProfile()
 
             if (currentUser == null) {
-                Toast.makeText(requireContext(), "Error: No se pudo verificar el usuario.", Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(), "Error de sesión.", Toast.LENGTH_LONG).show()
                 binding.btnConfirmTransaction.isEnabled = true
                 return@launch
             }
@@ -105,14 +97,15 @@ class CartFragment : Fragment() {
                     binding.btnConfirmTransaction.isEnabled = true
                     return@launch
                 }
-                inventoryRepository.processPickupTransaction(items, currentUser.id, currentUser.name) // CORREGIDO
+                inventoryRepository.processPickupTransaction(items, currentUser.id, currentUser.name)
             } else {
-                if (currentUserLoans.isEmpty()) {
-                    Toast.makeText(requireContext(), "No hay préstamos para devolver.", Toast.LENGTH_SHORT).show()
+                val items = cartAdapter.getCartList()
+                if (items.isEmpty()) {
+                    Toast.makeText(requireContext(), "No hay herramientas para devolver.", Toast.LENGTH_SHORT).show()
                     binding.btnConfirmTransaction.isEnabled = true
                     return@launch
                 }
-                inventoryRepository.processReturnTransaction(currentUserLoans)
+                inventoryRepository.processReturnTransaction(items, currentUser.id, currentUser.name)
             }
 
             if (success) {
@@ -120,7 +113,7 @@ class CartFragment : Fragment() {
                 if (isRecogida) {
                     CartManager.clearCart()
                 } else {
-                    loadUserLoans() // Recargar la lista de préstamos
+                    loadReturnItems()
                 }
             } else {
                 Toast.makeText(requireContext(), "Error al procesar la transacción.", Toast.LENGTH_LONG).show()
@@ -130,9 +123,18 @@ class CartFragment : Fragment() {
     }
 
     private fun setupRecyclerView() {
-        cartAdapter = CartAdapter(mutableListOf(), 
-            onQuantityChanged = {_,_ -> /* No-op en devolución */}, 
-            onItemRemoved = {_ -> /* No-op en devolución */}
+        cartAdapter = CartAdapter(
+            tools = emptyList(),
+            onItemRemoved = { tool ->
+                if (isRecogida) {
+                    CartManager.removeTool(tool)
+                } else {
+                    // Si el operario no quiere devolver una herramienta hoy, la quita de la lista visual
+                    toolsToReturn.remove(tool)
+                    cartAdapter.updateList(toolsToReturn)
+                    updateTotals(toolsToReturn.size)
+                }
+            }
         )
         binding.rvCartItems.layoutManager = LinearLayoutManager(requireContext())
         binding.rvCartItems.adapter = cartAdapter
@@ -140,9 +142,8 @@ class CartFragment : Fragment() {
         binding.btnConfirmTransaction.setOnClickListener { confirmTransaction() }
     }
 
-    private fun updateTotals() {
-        val total = cartAdapter.getCartList().sumOf { it.quantity }
-        binding.tvTotalItems.text = total.toString()
+    private fun updateTotals(count: Int) {
+        binding.tvTotalItems.text = count.toString()
     }
 
     override fun onDestroyView() {

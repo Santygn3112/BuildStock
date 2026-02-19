@@ -15,6 +15,10 @@ class AddToolActivity : AppCompatActivity() {
     private lateinit var binding: ActivityAddToolBinding
     private val repository = InventoryRepository()
     private var toolId: String? = null
+    // Guardamos el estado actual por si estamos editando
+    private var currentStatus: String = "disponible"
+    private var currentUserId: String = ""
+    private var currentUserName: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -30,7 +34,7 @@ class AddToolActivity : AppCompatActivity() {
 
         if (toolId != null) {
             binding.toolbarAddTool.title = "Editar Herramienta"
-            binding.btnSaveTool.text = "ACTUALIZAR HERRAMIENTA"
+            binding.btnSaveTool.text = "ACTUALIZAR DATOS"
             loadToolData(toolId!!)
         }
 
@@ -52,9 +56,13 @@ class AddToolActivity : AppCompatActivity() {
             if (tool != null) {
                 binding.etName.setText(tool.name)
                 binding.etBrandModel.setText(tool.brandModel)
-                binding.etStock.setText(tool.stock.toString())
                 binding.etLocation.setText(tool.location)
                 binding.etDescription.setText(tool.description)
+
+                // Preservamos el estado del tracking para no perderlo al editar
+                currentStatus = tool.status
+                currentUserId = tool.currentUserId
+                currentUserName = tool.currentUserName
 
                 val categories = arrayOf("Herramientas Eléctricas", "Herramientas Manuales", "Consumibles", "Medición", "EPIS")
                 val categoryIndex = categories.indexOf(tool.category)
@@ -69,26 +77,25 @@ class AddToolActivity : AppCompatActivity() {
         val name = binding.etName.text.toString().trim()
         val brandModel = binding.etBrandModel.text.toString().trim()
         val category = binding.spinnerCategory.selectedItem.toString()
-        val stockString = binding.etStock.text.toString().trim()
         val location = binding.etLocation.text.toString().trim()
         val description = binding.etDescription.text.toString().trim()
-
-        val stock = stockString.toIntOrNull() ?: 0
 
         if (name.isEmpty()) {
             binding.etName.error = "El nombre es obligatorio"
             return
         }
 
+        // Creamos el objeto con los nuevos campos de tracking
         val tool = Tool(
-            id = toolId ?: "", // CORREGIDO
+            id = toolId ?: "",
             name = name,
             brandModel = brandModel,
             category = category,
-            stock = stock,
             location = location,
             description = description,
-            status = if (stock > 0) "disponible" else "en uso"
+            status = currentStatus,
+            currentUserId = currentUserId,
+            currentUserName = currentUserName
         )
 
         lifecycleScope.launch {
@@ -100,7 +107,7 @@ class AddToolActivity : AppCompatActivity() {
             }
 
             if (success) {
-                Toast.makeText(this@AddToolActivity, "Operación realizada con éxito", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@AddToolActivity, "Herramienta guardada con éxito", Toast.LENGTH_SHORT).show()
                 finish()
             } else {
                 Toast.makeText(this@AddToolActivity, "Error al guardar en Firebase", Toast.LENGTH_SHORT).show()

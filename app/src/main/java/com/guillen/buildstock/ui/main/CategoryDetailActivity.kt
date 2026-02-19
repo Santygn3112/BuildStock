@@ -32,6 +32,7 @@ class CategoryDetailActivity : AppCompatActivity() {
 
     private fun setupToolbar(categoryName: String) {
         binding.toolbarCategory.title = categoryName
+        // Mantenemos tu icono de navegación
         binding.toolbarCategory.setNavigationIcon(android.R.drawable.ic_media_previous)
         binding.toolbarCategory.setNavigationOnClickListener {
             finish()
@@ -48,12 +49,13 @@ class CategoryDetailActivity : AppCompatActivity() {
                 startActivity(intent)
             },
             onAddToCartClick = { tool ->
-                // Verificación inicial de stock antes de enviar al Manager
-                if (tool.stock > 0) {
-                    CartManager.addToCart(tool)
+                // CAMBIO CLAVE: Ya no chequeamos 'stock', sino el estado 'disponible'
+                if (tool.status.lowercase() == "disponible") {
+                    // CAMBIO CLAVE: El método ahora es addTool, no addToCart
+                    CartManager.addTool(tool)
                     Toast.makeText(this, "Añadido al carrito: ${tool.name}", Toast.LENGTH_SHORT).show()
                 } else {
-                    Toast.makeText(this, "Sin stock disponible", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, "Esta herramienta no está disponible actualmente", Toast.LENGTH_SHORT).show()
                 }
             }
         )
@@ -62,6 +64,7 @@ class CategoryDetailActivity : AppCompatActivity() {
 
     private fun loadTools(categoryName: String) {
         lifecycleScope.launch {
+            // El repositorio ya devuelve los objetos Tool actualizados
             val tools = repository.getToolsByCategory(categoryName)
             adapter.updateList(tools)
             binding.toolbarCategory.subtitle = "${tools.size} elementos"

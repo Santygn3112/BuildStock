@@ -1,6 +1,7 @@
 package com.guillen.buildstock.ui.dashboard
 
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
@@ -11,10 +12,8 @@ import com.guillen.buildstock.databinding.ItemToolBinding
 class ToolAdapter(
     private var tools: List<Tool>,
     private val onItemClick: (Tool) -> Unit,
-    private val onAddToCartClick: (Tool) -> Unit // Nuevo listener para el botón del carrito
+    private val onAddToCartClick: (Tool) -> Unit
 ) : RecyclerView.Adapter<ToolAdapter.ToolViewHolder>() {
-
-
 
     class ToolViewHolder(val binding: ItemToolBinding) : RecyclerView.ViewHolder(binding.root)
 
@@ -28,27 +27,45 @@ class ToolAdapter(
         val context = holder.itemView.context
 
         with(holder.binding) {
+            // IDs REALES de tu item_tool.xml
             tvToolName.text = tool.name
             tvToolBrandModel.text = tool.brandModel
 
-            // Lógica de estado y color
-            val statusText = "${tool.status.replaceFirstChar { it.uppercase() }} (${tool.stock} ud.)"
-            tvToolStatus.text = statusText
+            // Lógica de estado actualizada (Sin cantidades)
+            val isDisponible = tool.status.lowercase() == "disponible"
 
-            when (tool.status.lowercase()) {
-                "disponible" -> tvToolStatus.setTextColor(ContextCompat.getColor(context, R.color.brand_green))
-                "en uso" -> tvToolStatus.setTextColor(ContextCompat.getColor(context, R.color.brand_orange))
-                "averiada" -> tvToolStatus.setTextColor(ContextCompat.getColor(context, android.R.color.holo_red_dark))
-                else -> tvToolStatus.setTextColor(ContextCompat.getColor(context, android.R.color.darker_gray))
+            if (isDisponible) {
+                tvToolStatus.text = "Disponible"
+                tvToolStatus.setTextColor(ContextCompat.getColor(context, R.color.brand_green))
+                // Si está disponible, permitimos añadir al carrito
+                btnAddToCart.visibility = View.VISIBLE
+                btnAddToCart.isEnabled = true
+            } else {
+                // Si está en uso, mostramos quién la tiene (si el nombre no está vacío)
+                val statusText = if (tool.currentUserName.isNotEmpty()) {
+                    "En uso (${tool.currentUserName})"
+                } else {
+                    tool.status.replaceFirstChar { it.uppercase() }
+                }
+                tvToolStatus.text = statusText
+
+                // Colores según estado
+                val colorRes = when (tool.status.lowercase()) {
+                    "en uso" -> R.color.brand_orange
+                    "averiada" -> android.R.color.holo_red_dark
+                    else -> android.R.color.darker_gray
+                }
+                tvToolStatus.setTextColor(ContextCompat.getColor(context, colorRes))
+
+                // Si no está disponible, no se puede añadir al carrito para recoger
+                btnAddToCart.visibility = View.GONE
             }
 
-            // Listener para el clic en la tarjeta (abre detalle)
+            // Listeners
             root.setOnClickListener { onItemClick(tool) }
-
-            // Listener para el botón de añadir al carrito
             btnAddToCart.setOnClickListener { onAddToCartClick(tool) }
 
-            // TODO: Aquí cargaremos la imagen con Glide/Coil usando tool.imageUrl
+            // TODO: Cargar imagen con Glide/Coil usando tool.imageUrl si existe
         }
     }
 
