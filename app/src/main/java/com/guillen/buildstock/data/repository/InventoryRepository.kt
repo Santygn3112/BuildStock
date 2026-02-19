@@ -101,42 +101,52 @@ class InventoryRepository {
 
     // --- LÓGICA DE TRANSACCIONES ---
 
+    // ... (Mantén el resto del archivo igual hasta las transacciones)
+
     suspend fun processPickupTransaction(tools: List<Tool>, userId: String, userName: String): Boolean {
+        if (userId.isEmpty()) {
+            Log.e("FIREBASE_MONITOR", "Error: userId está vacío en la transacción")
+            return false
+        }
         return try {
-            if (userId.isEmpty() || tools.isEmpty()) return false
             val batch = db.batch()
+            var operationsCount = 0
 
             for (tool in tools) {
-                if (tool.id.isEmpty()) continue
-                val toolRef = toolsCollection.document(tool.id)
+                if (tool.id.isEmpty()) {
+                    Log.e("FIREBASE_MONITOR", "Error: La herramienta ${tool.name} tiene ID vacío")
+                    continue
+                }
 
-                // 1. Asignamos la herramienta al operario
+                val toolRef = toolsCollection.document(tool.id)
                 batch.update(toolRef, mapOf(
                     "status" to "en uso",
                     "currentUserId" to userId,
                     "currentUserName" to userName
                 ))
 
-                // 2. Guardamos el registro en el historial
                 val movementRef = movementsCollection.document()
                 val movement = Movement(
-                    id = movementRef.id,
                     toolId = tool.id,
                     toolName = tool.name,
                     userId = userId,
                     userName = userName,
-                    type = "RECOGIDA",
-                    timestamp = System.currentTimeMillis()
+                    type = "RECOGIDA"
                 )
                 batch.set(movementRef, movement)
+                operationsCount++
             }
+
+            if (operationsCount == 0) return false
+
             batch.commit().await()
             true
         } catch (e: Exception) {
-            Log.e("FIREBASE_MONITOR", "Fallo en processPickupTransaction: ${e.message}", e)
+            Log.e("FIREBASE_MONITOR", "Fallo en pickup: ${e.message}")
             false
         }
     }
+// ... (Aplica la misma lógica de validación de id.isEmpty() a processReturnTransaction)
 
     suspend fun processReturnTransaction(tools: List<Tool>, userId: String, userName: String): Boolean {
         return try {

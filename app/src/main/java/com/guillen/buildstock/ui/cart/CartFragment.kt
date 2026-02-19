@@ -69,12 +69,17 @@ class CartFragment : Fragment() {
     private fun loadReturnItems() {
         viewLifecycleOwner.lifecycleScope.launch {
             val currentUser = authRepository.getUserProfile()
-            if (currentUser != null) {
+            // VALIDACIÓN: Si el ID está vacío, es que el modelo User.kt está mal
+            if (currentUser != null && currentUser.id.isNotEmpty()) {
                 toolsToReturn = inventoryRepository.getToolsByUserId(currentUser.id).toMutableList()
                 cartAdapter.updateList(toolsToReturn)
                 updateTotals(toolsToReturn.size)
             } else {
-                Toast.makeText(requireContext(), "Error: Usuario no identificado", Toast.LENGTH_SHORT).show()
+                val errorMsg = if (currentUser?.id?.isEmpty() == true)
+                    "Error crítico: ID de usuario vacío. Revisa User.kt"
+                else "Inicia sesión de nuevo."
+                Toast.makeText(requireContext(), errorMsg, Toast.LENGTH_LONG).show()
+                cartAdapter.updateList(emptyList())
             }
         }
     }
@@ -84,8 +89,8 @@ class CartFragment : Fragment() {
             binding.btnConfirmTransaction.isEnabled = false
             val currentUser = authRepository.getUserProfile()
 
-            if (currentUser == null) {
-                Toast.makeText(requireContext(), "Error de sesión.", Toast.LENGTH_LONG).show()
+            if (currentUser == null || currentUser.id.isEmpty()) {
+                Toast.makeText(requireContext(), "Error: No se pudo verificar tu identidad.", Toast.LENGTH_LONG).show()
                 binding.btnConfirmTransaction.isEnabled = true
                 return@launch
             }
@@ -116,7 +121,7 @@ class CartFragment : Fragment() {
                     loadReturnItems()
                 }
             } else {
-                Toast.makeText(requireContext(), "Error al procesar la transacción.", Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(), "Error al procesar. Revisa Logcat.", Toast.LENGTH_LONG).show()
             }
             binding.btnConfirmTransaction.isEnabled = true
         }
@@ -129,7 +134,6 @@ class CartFragment : Fragment() {
                 if (isRecogida) {
                     CartManager.removeTool(tool)
                 } else {
-                    // Si el operario no quiere devolver una herramienta hoy, la quita de la lista visual
                     toolsToReturn.remove(tool)
                     cartAdapter.updateList(toolsToReturn)
                     updateTotals(toolsToReturn.size)
