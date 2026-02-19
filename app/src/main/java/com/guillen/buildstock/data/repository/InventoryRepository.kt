@@ -6,6 +6,7 @@ import com.google.firebase.firestore.Query
 import com.guillen.buildstock.data.model.Movement
 import com.guillen.buildstock.data.model.Tool
 import kotlinx.coroutines.tasks.await
+import java.util.Calendar
 
 class InventoryRepository {
     private val db = FirebaseFirestore.getInstance()
@@ -88,7 +89,7 @@ class InventoryRepository {
         }
     }
 
-    // NUEVO: Obtener todas las herramientas que tiene un usuario ahora mismo (Para Devolución y Perfil)
+    // Obtener todas las herramientas que tiene un usuario ahora mismo
     suspend fun getToolsByUserId(userId: String): List<Tool> {
         return try {
             val snapshot = toolsCollection.whereEqualTo("currentUserId", userId).get().await()
@@ -99,9 +100,32 @@ class InventoryRepository {
         }
     }
 
-    // --- LÓGICA DE TRANSACCIONES ---
+    // NUEVO: Contador de movimientos de un usuario en el día de hoy (Para el Perfil)
+    suspend fun getTodayUserMovementsCount(userId: String): Int {
+        return try {
+            val snapshot = movementsCollection
+                .whereEqualTo("userId", userId)
+                .get()
+                .await()
 
-    // ... (Mantén el resto del archivo igual hasta las transacciones)
+            // Calculamos el inicio del día a las 00:00 en milisegundos
+            val calendar = Calendar.getInstance()
+            calendar.set(Calendar.HOUR_OF_DAY, 0)
+            calendar.set(Calendar.MINUTE, 0)
+            calendar.set(Calendar.SECOND, 0)
+            calendar.set(Calendar.MILLISECOND, 0)
+            val startOfDay = calendar.timeInMillis
+
+            val movements = snapshot.toObjects(Movement::class.java)
+            // Filtramos solo los que son de hoy
+            movements.count { it.timestamp >= startOfDay }
+        } catch (e: Exception) {
+            Log.e("FIREBASE_MONITOR", "Error en getTodayUserMovementsCount: ${e.message}", e)
+            0
+        }
+    }
+
+    // --- LÓGICA DE TRANSACCIONES ---
 
     suspend fun processPickupTransaction(tools: List<Tool>, userId: String, userName: String): Boolean {
         if (userId.isEmpty()) {
@@ -127,11 +151,13 @@ class InventoryRepository {
 
                 val movementRef = movementsCollection.document()
                 val movement = Movement(
+                    id = movementRef.id,
                     toolId = tool.id,
                     toolName = tool.name,
                     userId = userId,
                     userName = userName,
-                    type = "RECOGIDA"
+                    type = "RECOGIDA",
+                    timestamp = System.currentTimeMillis()
                 )
                 batch.set(movementRef, movement)
                 operationsCount++
@@ -146,25 +172,30 @@ class InventoryRepository {
             false
         }
     }
-// ... (Aplica la misma lógica de validación de id.isEmpty() a processReturnTransaction)
 
     suspend fun processReturnTransaction(tools: List<Tool>, userId: String, userName: String): Boolean {
+        if (userId.isEmpty()) {
+            Log.e("FIREBASE_MONITOR", "Error: userId está vacío en la transacción (devolución)")
+            return false
+        }
         return try {
-            if (userId.isEmpty() || tools.isEmpty()) return false
             val batch = db.batch()
+            var operationsCount = 0
 
             for (tool in tools) {
-                if (tool.id.isEmpty()) continue
+                if (tool.id.isEmpty()) {
+                    Log.e("FIREBASE_MONITOR", "Error: La herramienta ${tool.name} tiene ID vacío (devolución)")
+                    continue
+                }
+
                 val toolRef = toolsCollection.document(tool.id)
 
-                // 1. Liberamos la herramienta devolviéndola al almacén
                 batch.update(toolRef, mapOf(
                     "status" to "disponible",
                     "currentUserId" to "",
                     "currentUserName" to ""
                 ))
 
-                // 2. Guardamos el registro en el historial
                 val movementRef = movementsCollection.document()
                 val movement = Movement(
                     id = movementRef.id,
@@ -176,7 +207,11 @@ class InventoryRepository {
                     timestamp = System.currentTimeMillis()
                 )
                 batch.set(movementRef, movement)
+                operationsCount++
             }
+
+            if (operationsCount == 0) return false
+
             batch.commit().await()
             true
         } catch (e: Exception) {
@@ -185,7 +220,7 @@ class InventoryRepository {
         }
     }
 
-    // NUEVO: Para la sección de "Últimos Movimientos"
+    // Para la futura sección de "Últimos Movimientos" global
     suspend fun getRecentMovements(limit: Long = 10): List<Movement> {
         return try {
             val snapshot = movementsCollection

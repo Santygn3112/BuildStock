@@ -37,6 +37,9 @@
         <activity android:name=".ui.admin.AdminInventoryActivity" android:exported="false" />
         <activity android:name=".ui.admin.AdminUsersActivity" android:exported="false" />
         <activity android:name=".ui.admin.AddUserActivity" android:exported="false" />
+        <activity
+            android:name=".ui.main.RecentMovementsActivity"
+            android:exported="false" />
     </application>
 
 </manifest>

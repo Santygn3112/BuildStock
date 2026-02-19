@@ -1,5 +1,6 @@
 package com.guillen.buildstock.ui.main
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -8,17 +9,18 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import com.google.firebase.auth.FirebaseAuth
 import com.guillen.buildstock.data.repository.AuthRepository
+import com.guillen.buildstock.data.repository.InventoryRepository
 import com.guillen.buildstock.databinding.FragmentProfileBinding
-import kotlinx.coroutines.launch
-import kotlin.jvm.java
-import android.content.Intent
 import com.guillen.buildstock.ui.login.LoginActivity
+import kotlinx.coroutines.launch
 
 class ProfileFragment : Fragment() {
 
     private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding!!
+
     private val authRepository = AuthRepository()
+    private val inventoryRepository = InventoryRepository()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -36,7 +38,7 @@ class ProfileFragment : Fragment() {
     }
 
     private fun loadUserProfile() {
-        lifecycleScope.launch {
+        viewLifecycleOwner.lifecycleScope.launch {
             val user = authRepository.getUserProfile()
             if (user != null) {
                 binding.tvProfileName.text = user.name
@@ -45,14 +47,25 @@ class ProfileFragment : Fragment() {
                 binding.tvProfileRole.text = "$roleCapitalized — Planta 2"
                 binding.tvInitials.text = getInitials(user.name)
 
-                // VALIDACIÓN CRÍTICA DE ROL
+                // LÓGICA DE ROLES ACTUALIZADA
                 if (user.role.lowercase() == "admin") {
                     binding.btnAdminPanel.visibility = View.VISIBLE
+                    binding.btnRecentMovements.visibility = View.VISIBLE
+                } else {
+                    binding.btnAdminPanel.visibility = View.GONE
+                    binding.btnRecentMovements.visibility = View.GONE
                 }
-            }
 
-            binding.tvAssignedCount.text = "0"
-            binding.tvMovesCount.text = "0"
+                val assignedTools = inventoryRepository.getToolsByUserId(user.id)
+                binding.tvAssignedCount.text = assignedTools.size.toString()
+
+                val movesToday = inventoryRepository.getTodayUserMovementsCount(user.id)
+                binding.tvMovesCount.text = movesToday.toString()
+
+            } else {
+                binding.tvAssignedCount.text = "0"
+                binding.tvMovesCount.text = "0"
+            }
         }
     }
 
@@ -62,17 +75,20 @@ class ProfileFragment : Fragment() {
             startActivity(intent)
         }
 
-        binding.btnLogout.setOnClickListener {
-            // 1. Cerramos sesión usando el import directo
-            FirebaseAuth.getInstance().signOut()
+        // NUEVO: Listener del botón de Últimos Movimientos
+        binding.btnRecentMovements.setOnClickListener {
+            val intent = Intent(requireContext(), RecentMovementsActivity::class.java)
+            startActivity(intent)
+        }
 
-            // 2. Navegamos al Login de forma limpia
-            // ATENCIÓN: Si "LoginActivity" sale en rojo, pon el cursor encima y pulsa Alt + Enter
+        binding.btnLogout.setOnClickListener {
+            FirebaseAuth.getInstance().signOut()
             val intent = Intent(requireContext(), LoginActivity::class.java)
             intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
             startActivity(intent)
         }
     }
+
     private fun getInitials(fullName: String): String {
         val words = fullName.trim().split(" ")
         if (words.isEmpty()) return ""
