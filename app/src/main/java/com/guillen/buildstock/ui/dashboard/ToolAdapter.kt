@@ -28,29 +28,24 @@ class ToolAdapter(
         val context = holder.itemView.context
 
         with(holder.binding) {
-            // IDs REALES de tu item_tool.xml
             tvToolName.text = tool.name
             tvToolBrandModel.text = tool.brandModel
 
-            // Lógica de estado actualizada (Sin cantidades)
             val isDisponible = tool.status.lowercase() == "disponible"
 
-            // CARGA DE IMAGEN CON GLIDE
             com.bumptech.glide.Glide.with(context)
                 .load(tool.imageUrl)
-                .placeholder(android.R.drawable.ic_menu_gallery) // Imagen mientras carga
-                .error(android.R.drawable.ic_menu_report_image)   // Imagen si el link está roto
+                .placeholder(android.R.drawable.ic_menu_gallery)
+                .error(android.R.drawable.ic_menu_report_image)
                 .centerCrop()
                 .into(ivToolImage)
 
             if (isDisponible) {
                 tvToolStatus.text = "Disponible"
                 tvToolStatus.setTextColor(ContextCompat.getColor(context, R.color.brand_green))
-                // Si está disponible, permitimos añadir al carrito
                 btnAddToCart.visibility = View.VISIBLE
                 btnAddToCart.isEnabled = true
             } else {
-                // Si está en uso, mostramos quién la tiene (si el nombre no está vacío)
                 val statusText = if (tool.currentUserName.isNotEmpty()) {
                     "En uso (${tool.currentUserName})"
                 } else {
@@ -58,7 +53,6 @@ class ToolAdapter(
                 }
                 tvToolStatus.text = statusText
 
-                // Colores según estado
                 val colorRes = when (tool.status.lowercase()) {
                     "en uso" -> R.color.brand_orange
                     "averiada" -> android.R.color.holo_red_dark
@@ -66,15 +60,11 @@ class ToolAdapter(
                 }
                 tvToolStatus.setTextColor(ContextCompat.getColor(context, colorRes))
 
-                // Si no está disponible, no se puede añadir al carrito para recoger
                 btnAddToCart.visibility = View.GONE
             }
 
-            // Listeners
             root.setOnClickListener { onItemClick(tool) }
             btnAddToCart.setOnClickListener { onAddToCartClick(tool) }
-
-            // TODO: Cargar imagen con Glide/Coil usando tool.imageUrl si existe
         }
     }
 

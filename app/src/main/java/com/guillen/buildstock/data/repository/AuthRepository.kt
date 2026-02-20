@@ -12,7 +12,6 @@ class AuthRepository {
     private val db = FirebaseFirestore.getInstance()
     private val auth = FirebaseAuth.getInstance()
 
-    // 1. INICIAR SESIÓN (Lo que le faltaba a tu ViewModel)
     suspend fun login(email: String, password: String): Boolean {
         return try {
             auth.signInWithEmailAndPassword(email, password).await()
@@ -23,7 +22,6 @@ class AuthRepository {
         }
     }
 
-    // 2. OBTENER PERFIL DEL USUARIO ACTUAL (Lo que le faltaba a tu ViewModel)
     suspend fun getUserProfile(): User? {
         return try {
             val uid = auth.currentUser?.uid ?: return null
@@ -35,7 +33,6 @@ class AuthRepository {
         }
     }
 
-    // 3. OBTENER TODOS LOS USUARIOS (Para el listado de Admin)
     suspend fun getAllUsers(): List<User> {
         return try {
             val snapshot = db.collection("users").get().await()
@@ -46,7 +43,6 @@ class AuthRepository {
         }
     }
 
-    // 4. REGISTRO DE NUEVO USUARIO COMO ADMIN (Sin cerrar sesión actual)
     suspend fun registerUserAsAdmin(context: Context, name: String, email: String, password: String, role: String, phone: String): Boolean {
         return try {
             val defaultApp = FirebaseApp.getInstance()
@@ -81,7 +77,6 @@ class AuthRepository {
         }
     }
 
-    // 5. ACTUALIZAR PERFIL (Nombre, Rol y Teléfono)
     suspend fun updateUserProfile(email: String, newName: String, newRole: String, newPhone: String): Boolean {
         return try {
             val snapshot = db.collection("users").whereEqualTo("email", email).get().await()
@@ -104,7 +99,6 @@ class AuthRepository {
         }
     }
 
-    // 6. BORRAR USUARIO
     suspend fun deleteUser(userEmail: String): Boolean {
         return try {
             val snapshot = db.collection("users").whereEqualTo("email", userEmail).get().await()

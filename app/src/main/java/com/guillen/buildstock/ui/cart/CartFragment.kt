@@ -69,7 +69,6 @@ class CartFragment : Fragment() {
     private fun loadReturnItems() {
         viewLifecycleOwner.lifecycleScope.launch {
             val currentUser = authRepository.getUserProfile()
-            // VALIDACIÓN: Si el ID está vacío, es que el modelo User.kt está mal
             if (currentUser != null && currentUser.id.isNotEmpty()) {
                 toolsToReturn = inventoryRepository.getToolsByUserId(currentUser.id).toMutableList()
                 cartAdapter.updateList(toolsToReturn)

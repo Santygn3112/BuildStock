@@ -64,7 +64,6 @@ class AddToolActivity : AppCompatActivity() {
                 currentUserId = tool.currentUserId
                 currentUserName = tool.currentUserName
 
-                // Sincronizamos la selección del spinner con las categorías oficiales
                 val categories = resources.getStringArray(R.array.tool_categories)
                 val categoryIndex = categories.indexOf(tool.category)
                 if (categoryIndex >= 0) {

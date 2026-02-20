@@ -23,15 +23,11 @@ class CartAdapter(
         val tool = tools[position]
 
         with(holder.binding) {
-            // ID REAL: tvToolNameCart
             tvToolNameCart.text = tool.name
 
-            // Ocultamos controles de stock que ya no usamos en este nuevo sistema
             btnMinus.visibility = View.GONE
             btnPlus.visibility = View.GONE
             tvQuantity.visibility = View.GONE
-
-            // ID REAL: btnDelete (para quitar del carrito o de la lista de devolución)
             btnDelete.setOnClickListener { onItemRemoved(tool) }
         }
     }

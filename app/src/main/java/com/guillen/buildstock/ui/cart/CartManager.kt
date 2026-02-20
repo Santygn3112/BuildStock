@@ -10,7 +10,6 @@ object CartManager {
 
     fun addTool(tool: Tool) {
         val current = _cartItems.value ?: emptyList()
-        // Evitamos añadir la misma herramienta dos veces
         if (current.none { it.id == tool.id }) {
             _cartItems.value = current + tool
         }

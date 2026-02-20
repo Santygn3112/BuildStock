@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.guillen.buildstock.R
 import com.guillen.buildstock.data.repository.InventoryRepository
 import com.guillen.buildstock.databinding.ActivityCategoryDetailBinding
 import com.guillen.buildstock.ui.cart.CartManager
@@ -32,8 +33,7 @@ class CategoryDetailActivity : AppCompatActivity() {
 
     private fun setupToolbar(categoryName: String) {
         binding.toolbarCategory.title = categoryName
-        // Mantenemos tu icono de navegación
-        binding.toolbarCategory.setNavigationIcon(android.R.drawable.ic_media_previous)
+        binding.toolbarCategory.setNavigationIcon(R.drawable.baseline_arrow_back_ios_new_24)
         binding.toolbarCategory.setNavigationOnClickListener {
             finish()
         }
@@ -49,9 +49,7 @@ class CategoryDetailActivity : AppCompatActivity() {
                 startActivity(intent)
             },
             onAddToCartClick = { tool ->
-                // CAMBIO CLAVE: Ya no chequeamos 'stock', sino el estado 'disponible'
                 if (tool.status.lowercase() == "disponible") {
-                    // CAMBIO CLAVE: El método ahora es addTool, no addToCart
                     CartManager.addTool(tool)
                     Toast.makeText(this, "Añadido al carrito: ${tool.name}", Toast.LENGTH_SHORT).show()
                 } else {
@@ -64,7 +62,6 @@ class CategoryDetailActivity : AppCompatActivity() {
 
     private fun loadTools(categoryName: String) {
         lifecycleScope.launch {
-            // El repositorio ya devuelve los objetos Tool actualizados
             val tools = repository.getToolsByCategory(categoryName)
             adapter.updateList(tools)
             binding.toolbarCategory.subtitle = "${tools.size} elementos"

@@ -33,11 +33,9 @@ class MovementAdapter(
             tvMovementUser.text = "Operario: ${movement.userName}"
             tvMovementType.text = movement.type
 
-            // Formatear la fecha
             val sdf = SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault())
             tvMovementDate.text = sdf.format(Date(movement.timestamp))
 
-            // Color del badge según sea Recogida o Devolución
             val colorRes = if (movement.type == "RECOGIDA") R.color.brand_orange else R.color.brand_green
             tvMovementType.backgroundTintList = ColorStateList.valueOf(ContextCompat.getColor(context, colorRes))
         }

@@ -65,21 +65,17 @@ class AddUserActivity : AppCompatActivity() {
         }
 
         lifecycleScope.launch {
-            // Mostramos un aviso de que estamos trabajando
             Toast.makeText(this@AddUserActivity, "Procesando...", Toast.LENGTH_SHORT).show()
 
             if (userEmailToEdit != null) {
-                // MODO EDICIÓN
                 val success = authRepository.updateUserProfile(userEmailToEdit!!, name, role, phone)
                 if (success) {
                     Toast.makeText(this@AddUserActivity, "Usuario actualizado correctamente", Toast.LENGTH_SHORT).show()
                     finish()
                 } else {
-                    // AHORA SÍ SALDRÁ AVISO SI FALLA
                     Toast.makeText(this@AddUserActivity, "Error al actualizar en la base de datos", Toast.LENGTH_LONG).show()
                 }
             } else {
-                // MODO CREACIÓN
                 val email = binding.etUserEmail.text.toString()
                 val password = binding.etUserPassword.text.toString()
 
@@ -93,7 +89,6 @@ class AddUserActivity : AppCompatActivity() {
                     Toast.makeText(this@AddUserActivity, "Usuario creado con éxito", Toast.LENGTH_SHORT).show()
                     finish()
                 } else {
-                    // AHORA SÍ SALDRÁ AVISO SI FALLA (Ej: correo ya registrado)
                     Toast.makeText(this@AddUserActivity, "Error al crear: revisa si el correo ya existe", Toast.LENGTH_LONG).show()
                 }
             }

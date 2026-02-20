@@ -17,7 +17,6 @@ class HomeFragment : Fragment() {
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
-    // Instanciamos el repositorio para las estadísticas
     private val repository = InventoryRepository()
 
     override fun onCreateView(
@@ -48,7 +47,6 @@ class HomeFragment : Fragment() {
     }
 
     private fun setupClickListeners() {
-        // Enlazamos directamente con los IDs reales de tu XML
         binding.cardElectric.setOnClickListener {
             openCategory("Herramientas Eléctricas")
         }

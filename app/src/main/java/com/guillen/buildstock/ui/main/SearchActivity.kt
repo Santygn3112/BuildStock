@@ -22,7 +22,6 @@ class SearchActivity : AppCompatActivity() {
     private val repository = InventoryRepository()
     private lateinit var adapter: ToolAdapter
 
-    // Aquí guardaremos la lista completa para no volver a llamar a Firebase
     private var allTools: List<Tool> = emptyList()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -30,21 +29,18 @@ class SearchActivity : AppCompatActivity() {
         binding = ActivitySearchBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        // Botón de atrás
         binding.toolbarSearch.setNavigationIcon(android.R.drawable.ic_media_previous)
         binding.toolbarSearch.setNavigationOnClickListener { finish() }
 
         setupRecyclerView()
         setupSearchListener()
 
-        // Pedimos foco para que el teclado se abra automáticamente (mejor UX)
         binding.etSearchInput.requestFocus()
 
         loadAllTools()
     }
 
     private fun setupRecyclerView() {
-        // Reutilizamos el ToolAdapter que el agente de IA te habrá hecho "Chunky"
         adapter = ToolAdapter(
             tools = emptyList(),
             onItemClick = { tool ->
@@ -80,7 +76,6 @@ class SearchActivity : AppCompatActivity() {
     private fun loadAllTools() {
         lifecycleScope.launch {
             allTools = repository.getToolsList()
-            // Al abrir la pantalla, mostramos todas las herramientas por defecto
             adapter.updateList(allTools)
         }
     }
@@ -92,7 +87,6 @@ class SearchActivity : AppCompatActivity() {
         }
 
         val lowerCaseQuery = query.lowercase()
-        // Filtramos buscando coincidencias en nombre, marca o categoría
         val filteredList = allTools.filter { tool ->
             tool.name.lowercase().contains(lowerCaseQuery) ||
                     tool.brandModel.lowercase().contains(lowerCaseQuery) ||

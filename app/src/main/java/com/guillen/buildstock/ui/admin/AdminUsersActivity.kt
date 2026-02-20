@@ -6,6 +6,7 @@ import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
+import com.guillen.buildstock.R
 import com.guillen.buildstock.data.repository.AuthRepository
 import com.guillen.buildstock.databinding.ActivityAdminUsersBinding
 import kotlinx.coroutines.launch
@@ -21,7 +22,7 @@ class AdminUsersActivity : AppCompatActivity() {
         binding = ActivityAdminUsersBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.toolbarAdminUsers.setNavigationIcon(android.R.drawable.ic_media_previous)
+        binding.toolbarAdminUsers.setNavigationIcon(R.drawable.baseline_arrow_back_ios_new_24)
         binding.toolbarAdminUsers.setNavigationOnClickListener { finish() }
 
         binding.btnAddNewUserTop.setOnClickListener {
@@ -40,12 +41,12 @@ class AdminUsersActivity : AppCompatActivity() {
                     putExtra("USER_NAME", user.name)
                     putExtra("USER_EMAIL", user.email)
                     putExtra("USER_ROLE", user.role)
-                    putExtra("USER_PHONE", user.phone) // <-- PASAMOS EL TELÉFONO
+                    putExtra("USER_PHONE", user.phone)
                 }
                 startActivity(intent)
             },
             onDeleteClick = { user ->
-                confirmDelete(user.email ?: "", user.name) // Pasamos el email como ID (o el campo que uses como clave)
+                confirmDelete(user.email ?: "", user.name)
             }
         )
         binding.rvAdminUsers.adapter = adapter
@@ -60,7 +61,7 @@ class AdminUsersActivity : AppCompatActivity() {
                     val success = authRepository.deleteUser(userId)
                     if (success) {
                         Toast.makeText(this@AdminUsersActivity, "Usuario eliminado", Toast.LENGTH_SHORT).show()
-                        loadUsers() // Recargar la lista
+                        loadUsers()
                     } else {
                         Toast.makeText(this@AdminUsersActivity, "Error al eliminar", Toast.LENGTH_SHORT).show()
                     }
@@ -70,20 +71,15 @@ class AdminUsersActivity : AppCompatActivity() {
             .show()
     }
 
-    // 1. Crea esta función para cargar los datos
     private fun loadUsers() {
         lifecycleScope.launch {
-            // Mostramos algún indicador de carga si quieres
             val users = authRepository.getAllUsers()
-            adapter.updateList(users) // Asumiendo que tu adapter tiene updateList
+            adapter.updateList(users)
         }
     }
 
-    // 2. Sobrescribe el método onResume
     override fun onResume() {
         super.onResume()
-        // Cada vez que volvemos a esta pantalla (al hacer finish() en la otra),
-        // pedimos los usuarios de nuevo a Firebase.
         loadUsers()
     }
 }

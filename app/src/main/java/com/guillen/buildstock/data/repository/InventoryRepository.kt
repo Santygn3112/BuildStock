@@ -13,8 +13,6 @@ class InventoryRepository {
     private val toolsCollection = db.collection("tools")
     private val movementsCollection = db.collection("movements")
 
-    // --- GESTIÓN DE HERRAMIENTAS (CRUD) ---
-
     suspend fun getToolById(id: String): Tool? {
         return try {
             val snapshot = toolsCollection.document(id).get().await()
@@ -57,7 +55,6 @@ class InventoryRepository {
         }
     }
 
-    // --- CONSULTAS ---
 
     suspend fun getToolsCountByStatus(status: String): Int {
         return try {
@@ -89,7 +86,6 @@ class InventoryRepository {
         }
     }
 
-    // Obtener todas las herramientas que tiene un usuario ahora mismo
     suspend fun getToolsByUserId(userId: String): List<Tool> {
         return try {
             val snapshot = toolsCollection.whereEqualTo("currentUserId", userId).get().await()
@@ -100,7 +96,6 @@ class InventoryRepository {
         }
     }
 
-    // NUEVO: Contador de movimientos de un usuario en el día de hoy (Para el Perfil)
     suspend fun getTodayUserMovementsCount(userId: String): Int {
         return try {
             val snapshot = movementsCollection
@@ -108,7 +103,6 @@ class InventoryRepository {
                 .get()
                 .await()
 
-            // Calculamos el inicio del día a las 00:00 en milisegundos
             val calendar = Calendar.getInstance()
             calendar.set(Calendar.HOUR_OF_DAY, 0)
             calendar.set(Calendar.MINUTE, 0)
@@ -117,15 +111,12 @@ class InventoryRepository {
             val startOfDay = calendar.timeInMillis
 
             val movements = snapshot.toObjects(Movement::class.java)
-            // Filtramos solo los que son de hoy
             movements.count { it.timestamp >= startOfDay }
         } catch (e: Exception) {
             Log.e("FIREBASE_MONITOR", "Error en getTodayUserMovementsCount: ${e.message}", e)
             0
         }
     }
-
-    // --- LÓGICA DE TRANSACCIONES ---
 
     suspend fun processPickupTransaction(tools: List<Tool>, userId: String, userName: String): Boolean {
         if (userId.isEmpty()) {
@@ -220,7 +211,6 @@ class InventoryRepository {
         }
     }
 
-    // Para la futura sección de "Últimos Movimientos" global
     suspend fun getRecentMovements(limit: Long = 10): List<Movement> {
         return try {
             val snapshot = movementsCollection

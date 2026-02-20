@@ -27,7 +27,6 @@ class LoginActivity : AppCompatActivity() {
             val pass = binding.etPassword.text.toString()
 
             if (email.isNotEmpty() && pass.isNotEmpty()) {
-                // 1. Corregido el nombre de la función
                 viewModel.login(email, pass)
             } else {
                 Toast.makeText(this, getString(R.string.error_empty_fields), Toast.LENGTH_SHORT).show()
@@ -36,7 +35,6 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun setupObservers() {
-        // 2. Observamos el estado del login (Boolean)
         viewModel.loginStatus.observe(this) { success ->
             if (success) {
                 Toast.makeText(this, "Login OK, verificando perfil...", Toast.LENGTH_SHORT).show()
@@ -46,16 +44,13 @@ class LoginActivity : AppCompatActivity() {
             }
         }
 
-        // 3. Observamos los errores para mostrarlos en el Toast
         viewModel.errorMessage.observe(this) { message ->
             message?.let {
                 Toast.makeText(this, it, Toast.LENGTH_LONG).show()
             }
         }
 
-        // 4. Observamos si está cargando para ocultar/mostrar elementos (Opcional)
         viewModel.isLoading.observe(this) { loading ->
-            // Puedes ocultar el botón o mostrar un ProgressBar aquí
             binding.btnEnter.isEnabled = !loading
         }
     }

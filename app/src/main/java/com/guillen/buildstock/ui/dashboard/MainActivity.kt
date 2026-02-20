@@ -21,7 +21,6 @@ class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        // Bloqueo del modo oscuro
         androidx.appcompat.app.AppCompatDelegate.setDefaultNightMode(
             androidx.appcompat.app.AppCompatDelegate.MODE_NIGHT_NO
         )
@@ -34,8 +33,6 @@ class MainActivity : AppCompatActivity() {
         if (savedInstanceState == null) {
             loadFragment(HomeFragment())
         }
-
-        // TODO: BORRAR O COMENTAR ESTA LÍNEA DESPUÉS DE LA PRIMERA EJECUCIÓN
     }
 
     private fun setupBottomNavigation() {

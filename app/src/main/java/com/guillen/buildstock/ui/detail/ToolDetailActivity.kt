@@ -12,13 +12,12 @@ import androidx.lifecycle.lifecycleScope
 import com.bumptech.glide.Glide
 import com.google.firebase.firestore.FirebaseFirestore
 import com.guillen.buildstock.R
-import com.guillen.buildstock.data.model.Tool
 import com.guillen.buildstock.data.model.User
 import com.guillen.buildstock.data.repository.InventoryRepository
 import com.guillen.buildstock.databinding.ActivityToolDetailBinding
 import com.guillen.buildstock.ui.cart.CartManager
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.tasks.await // ESTE ES EL IMPORT QUE TE FALTA
+import kotlinx.coroutines.tasks.await
 
 class ToolDetailActivity : AppCompatActivity() {
 
@@ -54,13 +53,18 @@ class ToolDetailActivity : AppCompatActivity() {
                 binding.tvDetailLocation.text = selectedTool.location
                 binding.tvDetailDescription.text = selectedTool.description
 
-                // Carga de imagen con Glide
                 if (!selectedTool.imageUrl.isNullOrEmpty()) {
                     binding.ivDetailImage.setPadding(0, 0, 0, 0)
+                    binding.ivDetailImage.imageTintList = null
+
                     Glide.with(this@ToolDetailActivity)
                         .load(selectedTool.imageUrl)
                         .centerCrop()
                         .into(binding.ivDetailImage)
+                } else {
+                    binding.ivDetailImage.setImageResource(android.R.drawable.ic_menu_gallery)
+                    val tintColor = ContextCompat.getColor(this@ToolDetailActivity, R.color.brand_navy)
+                    binding.ivDetailImage.imageTintList = ColorStateList.valueOf(tintColor)
                 }
 
                 val isDisponible = selectedTool.status.lowercase() == "disponible"
@@ -78,14 +82,12 @@ class ToolDetailActivity : AppCompatActivity() {
                         finish()
                     }
                 } else {
-                    // Estado: EN USO
                     binding.tvDetailStatus.text = "En uso por ${selectedTool.currentUserName}"
                     binding.tvDetailStatus.backgroundTintList = ColorStateList.valueOf(
                         ContextCompat.getColor(this@ToolDetailActivity, R.color.brand_orange)
                     )
                     binding.btnAddToCart.visibility = View.GONE
 
-                    // Mostrar botón de llamada si hay un ID de usuario asignado
                     if (selectedTool.currentUserId.isNotEmpty()) {
                         binding.btnCallUser.visibility = View.VISIBLE
                         binding.btnCallUser.setOnClickListener {
@@ -112,10 +114,10 @@ class ToolDetailActivity : AppCompatActivity() {
                     intent.data = Uri.parse("tel:$phone")
                     startActivity(intent)
                 } else {
-                    Toast.makeText(this@ToolDetailActivity, "Este operario no tiene teléfono registrado.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@ToolDetailActivity, "El operario no tiene teléfono.", Toast.LENGTH_SHORT).show()
                 }
             } catch (e: Exception) {
-                Toast.makeText(this@ToolDetailActivity, "Error al obtener datos del operario.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@ToolDetailActivity, "Error al conectar.", Toast.LENGTH_SHORT).show()
             }
         }
     }

@@ -15,7 +15,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:paddingTop="22dp"
-            app:title="Últimos 8 Movimientos"
+            app:navigationIcon="@drawable/baseline_arrow_back_ios_new_24"
+            app:title="Últimos Movimientos"
             app:titleTextAppearance="@style/TextAppearance.Material3.HeadlineMedium"
             app:titleTextColor="@android:color/white"
             app:navigationIconTint="@android:color/white"/>
