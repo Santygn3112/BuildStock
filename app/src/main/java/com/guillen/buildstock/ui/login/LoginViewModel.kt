@@ -33,8 +33,14 @@ class LoginViewModel : ViewModel() {
 
             if (success) {
                 val profile = authRepository.getUserProfile()
-                _userProfile.value = profile
-                _loginStatus.value = true
+                if (profile != null) {
+                    _userProfile.value = profile
+                    _loginStatus.value = true
+                } else {
+                    authRepository.signOut()
+                    _loginStatus.value = false
+                    _errorMessage.value = "Usuario no encontrado o acceso revocado"
+                }
             } else {
                 _loginStatus.value = false
                 _errorMessage.value = "Correo o contraseña incorrectos"
