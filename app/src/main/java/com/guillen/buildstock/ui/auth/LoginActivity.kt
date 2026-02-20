@@ -1,4 +1,4 @@
-package com.guillen.buildstock.ui.login
+package com.guillen.buildstock.ui.auth
 
 import android.content.Intent
 import android.os.Bundle
@@ -8,7 +8,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import com.guillen.buildstock.R
 import com.guillen.buildstock.databinding.ActivityLoginBinding
-import com.guillen.buildstock.ui.dashboard.MainActivity
+import com.guillen.buildstock.ui.main.MainActivity
 
 class LoginActivity : AppCompatActivity() {
 

@@ -1,4 +1,4 @@
-package com.guillen.buildstock.ui.dashboard
+package com.guillen.buildstock.ui.main
 
 import android.os.Bundle
 import android.util.Log
@@ -11,8 +11,8 @@ import com.guillen.buildstock.R
 import com.guillen.buildstock.data.model.Tool
 import com.guillen.buildstock.databinding.ActivityMainBinding
 import com.guillen.buildstock.ui.cart.CartFragment
-import com.guillen.buildstock.ui.main.HomeFragment
-import com.guillen.buildstock.ui.main.ProfileFragment
+import com.guillen.buildstock.ui.home.HomeFragment
+import com.guillen.buildstock.ui.profile.ProfileFragment
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 

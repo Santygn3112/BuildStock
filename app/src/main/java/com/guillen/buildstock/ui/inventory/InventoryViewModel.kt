@@ -1,4 +1,4 @@
-package com.guillen.buildstock.ui.dashboard
+package com.guillen.buildstock.ui.inventory
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData

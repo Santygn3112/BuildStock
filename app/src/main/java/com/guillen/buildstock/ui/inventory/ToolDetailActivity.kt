@@ -1,4 +1,4 @@
-package com.guillen.buildstock.ui.detail
+package com.guillen.buildstock.ui.inventory
 
 import android.content.Intent
 import android.content.res.ColorStateList

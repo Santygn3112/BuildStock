@@ -1,4 +1,4 @@
-package com.guillen.buildstock.ui.login
+package com.guillen.buildstock.ui.auth
 
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
