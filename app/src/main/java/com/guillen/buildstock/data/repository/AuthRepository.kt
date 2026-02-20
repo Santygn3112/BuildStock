@@ -114,4 +114,8 @@ class AuthRepository {
             false
         }
     }
+
+    fun signOut() {
+        auth.signOut()
+    }
 }

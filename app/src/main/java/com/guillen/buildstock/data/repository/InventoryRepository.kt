@@ -25,7 +25,8 @@ class InventoryRepository {
 
     suspend fun addTool(tool: Tool): Boolean {
         return try {
-            toolsCollection.add(tool).await()
+            val docRef = toolsCollection.add(tool).await()
+            docRef.update("id", docRef.id).await()
             true
         } catch (e: Exception) {
             Log.e("FIREBASE_MONITOR", "Error en addTool: ${e.message}", e)
