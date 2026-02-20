@@ -72,10 +72,10 @@ class AdminInventoryActivity : AppCompatActivity() {
         lifecycleScope.launch {
             val success = repository.deleteTool(id)
             if (success) {
-                Toast.makeText(this@AdminInventoryActivity, "Herramienta eliminada", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@AdminInventoryActivity, R.string.msg_tool_deleted, Toast.LENGTH_SHORT).show()
                 loadInventory()
             } else {
-                Toast.makeText(this@AdminInventoryActivity, "Error al eliminar", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@AdminInventoryActivity, R.string.msg_error_delete, Toast.LENGTH_SHORT).show()
             }
         }
     }

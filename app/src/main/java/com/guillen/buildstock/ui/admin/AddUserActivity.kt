@@ -34,8 +34,8 @@ class AddUserActivity : AppCompatActivity() {
         userEmailToEdit = intent.getStringExtra("USER_EMAIL")
 
         if (userEmailToEdit != null) {
-            supportActionBar?.title = "Editar Usuario"
-            binding.btnCreateUser.text = "ACTUALIZAR USUARIO"
+            supportActionBar?.setTitle(R.string.title_edit_user)
+            binding.btnCreateUser.setText(R.string.btn_update_user)
 
             binding.etUserName.setText(intent.getStringExtra("USER_NAME"))
             binding.etUserEmail.setText(userEmailToEdit)
@@ -50,7 +50,7 @@ class AddUserActivity : AppCompatActivity() {
 
             binding.etUserEmail.isEnabled = false
             binding.etUserPassword.isEnabled = false
-            binding.etUserPassword.hint = "No modificable por seguridad"
+            binding.etUserPassword.setHint(R.string.hint_password_locked)
         }
     }
 
@@ -60,36 +60,36 @@ class AddUserActivity : AppCompatActivity() {
         val role = if (binding.rbAdmin.isChecked) "admin" else "operario"
 
         if (name.isBlank()) {
-            Toast.makeText(this, "El nombre es obligatorio", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, R.string.error_name_required, Toast.LENGTH_SHORT).show()
             return
         }
 
         lifecycleScope.launch {
-            Toast.makeText(this@AddUserActivity, "Procesando...", Toast.LENGTH_SHORT).show()
+            Toast.makeText(this@AddUserActivity, R.string.msg_processing, Toast.LENGTH_SHORT).show()
 
             if (userEmailToEdit != null) {
                 val success = authRepository.updateUserProfile(userEmailToEdit!!, name, role, phone)
                 if (success) {
-                    Toast.makeText(this@AddUserActivity, "Usuario actualizado correctamente", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@AddUserActivity, R.string.msg_user_updated, Toast.LENGTH_SHORT).show()
                     finish()
                 } else {
-                    Toast.makeText(this@AddUserActivity, "Error al actualizar en la base de datos", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this@AddUserActivity, R.string.error_db_update, Toast.LENGTH_LONG).show()
                 }
             } else {
                 val email = binding.etUserEmail.text.toString()
                 val password = binding.etUserPassword.text.toString()
 
                 if (email.isBlank() || password.length < 6) {
-                    Toast.makeText(this@AddUserActivity, "El correo es obligatorio y la clave debe tener 6 caracteres", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this@AddUserActivity, R.string.error_email_password_req, Toast.LENGTH_LONG).show()
                     return@launch
                 }
 
                 val success = authRepository.registerUserAsAdmin(this@AddUserActivity, name, email, password, role, phone)
                 if (success) {
-                    Toast.makeText(this@AddUserActivity, "Usuario creado con éxito", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@AddUserActivity, R.string.msg_user_created, Toast.LENGTH_SHORT).show()
                     finish()
                 } else {
-                    Toast.makeText(this@AddUserActivity, "Error al crear: revisa si el correo ya existe", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this@AddUserActivity, R.string.error_user_creation, Toast.LENGTH_LONG).show()
                 }
             }
         }

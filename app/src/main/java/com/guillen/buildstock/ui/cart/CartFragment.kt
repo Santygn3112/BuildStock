@@ -45,11 +45,11 @@ class CartFragment : Fragment() {
             if (isChecked) {
                 isRecogida = checkedId == R.id.btnRecogida
                 if (isRecogida) {
-                    binding.tvTransactionTypeLabel.text = "RECOGIDA"
+                    binding.tvTransactionTypeLabel.setText(R.string.label_pickup)
                     binding.tvTransactionTypeLabel.setTextColor(ContextCompat.getColor(requireContext(), R.color.brand_orange))
                     loadPickupItems()
                 } else {
-                    binding.tvTransactionTypeLabel.text = "DEVOLUCIÓN"
+                    binding.tvTransactionTypeLabel.setText(R.string.label_return)
                     binding.tvTransactionTypeLabel.setTextColor(ContextCompat.getColor(requireContext(), R.color.brand_green))
                     loadReturnItems()
                 }
@@ -75,8 +75,8 @@ class CartFragment : Fragment() {
                 updateTotals(toolsToReturn.size)
             } else {
                 val errorMsg = if (currentUser?.id?.isEmpty() == true)
-                    "Error crítico: ID de usuario vacío. Revisa User.kt"
-                else "Inicia sesión de nuevo."
+                    getString(R.string.error_user_id_empty)
+                else getString(R.string.msg_login_again)
                 Toast.makeText(requireContext(), errorMsg, Toast.LENGTH_LONG).show()
                 cartAdapter.updateList(emptyList())
             }
@@ -89,7 +89,7 @@ class CartFragment : Fragment() {
             val currentUser = authRepository.getUserProfile()
 
             if (currentUser == null || currentUser.id.isEmpty()) {
-                Toast.makeText(requireContext(), "Error: No se pudo verificar tu identidad.", Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(), R.string.error_verify_identity, Toast.LENGTH_LONG).show()
                 binding.btnConfirmTransaction.isEnabled = true
                 return@launch
             }
@@ -97,7 +97,7 @@ class CartFragment : Fragment() {
             val success = if (isRecogida) {
                 val items = CartManager.cartItems.value ?: emptyList()
                 if (items.isEmpty()) {
-                    Toast.makeText(requireContext(), "El carrito está vacío.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), R.string.msg_cart_empty, Toast.LENGTH_SHORT).show()
                     binding.btnConfirmTransaction.isEnabled = true
                     return@launch
                 }
@@ -105,7 +105,7 @@ class CartFragment : Fragment() {
             } else {
                 val items = cartAdapter.getCartList()
                 if (items.isEmpty()) {
-                    Toast.makeText(requireContext(), "No hay herramientas para devolver.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), R.string.msg_no_tools_return, Toast.LENGTH_SHORT).show()
                     binding.btnConfirmTransaction.isEnabled = true
                     return@launch
                 }
@@ -113,14 +113,14 @@ class CartFragment : Fragment() {
             }
 
             if (success) {
-                Toast.makeText(requireContext(), "¡Transacción exitosa!", Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(), R.string.msg_transaction_success, Toast.LENGTH_LONG).show()
                 if (isRecogida) {
                     CartManager.clearCart()
                 } else {
                     loadReturnItems()
                 }
             } else {
-                Toast.makeText(requireContext(), "Error al procesar. Revisa Logcat.", Toast.LENGTH_LONG).show()
+                Toast.makeText(requireContext(), R.string.error_process_transaction, Toast.LENGTH_LONG).show()
             }
             binding.btnConfirmTransaction.isEnabled = true
         }

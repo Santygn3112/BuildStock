@@ -48,7 +48,7 @@ class ToolDetailActivity : AppCompatActivity() {
 
             tool?.let { selectedTool ->
                 binding.tvDetailName.text = selectedTool.name
-                binding.tvDetailBrandModel.text = "Marca/Modelo: ${selectedTool.brandModel}"
+                binding.tvDetailBrandModel.text = getString(R.string.detail_brand_model_format, selectedTool.brandModel)
                 binding.tvDetailCategory.text = selectedTool.category
                 binding.tvDetailLocation.text = selectedTool.location
                 binding.tvDetailDescription.text = selectedTool.description
@@ -69,7 +69,7 @@ class ToolDetailActivity : AppCompatActivity() {
 
                 val isDisponible = selectedTool.status.lowercase() == "disponible"
                 if (isDisponible) {
-                    binding.tvDetailStatus.text = "Disponible"
+                    binding.tvDetailStatus.setText(R.string.status_available)
                     binding.tvDetailStatus.backgroundTintList = ColorStateList.valueOf(
                         ContextCompat.getColor(this@ToolDetailActivity, R.color.brand_green)
                     )
@@ -78,11 +78,11 @@ class ToolDetailActivity : AppCompatActivity() {
 
                     binding.btnAddToCart.setOnClickListener {
                         CartManager.addTool(selectedTool)
-                        Toast.makeText(this@ToolDetailActivity, "Añadida al carrito", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@ToolDetailActivity, R.string.msg_added_to_cart_simple, Toast.LENGTH_SHORT).show()
                         finish()
                     }
                 } else {
-                    binding.tvDetailStatus.text = "En uso por ${selectedTool.currentUserName}"
+                    binding.tvDetailStatus.text = getString(R.string.status_in_use_by_format, selectedTool.currentUserName)
                     binding.tvDetailStatus.backgroundTintList = ColorStateList.valueOf(
                         ContextCompat.getColor(this@ToolDetailActivity, R.color.brand_orange)
                     )
@@ -114,10 +114,10 @@ class ToolDetailActivity : AppCompatActivity() {
                     intent.data = Uri.parse("tel:$phone")
                     startActivity(intent)
                 } else {
-                    Toast.makeText(this@ToolDetailActivity, "El operario no tiene teléfono.", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this@ToolDetailActivity, R.string.msg_no_phone, Toast.LENGTH_SHORT).show()
                 }
             } catch (e: Exception) {
-                Toast.makeText(this@ToolDetailActivity, "Error al conectar.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@ToolDetailActivity, R.string.error_connection, Toast.LENGTH_SHORT).show()
             }
         }
     }

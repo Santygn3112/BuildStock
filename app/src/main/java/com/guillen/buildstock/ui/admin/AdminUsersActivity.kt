@@ -54,20 +54,20 @@ class AdminUsersActivity : AppCompatActivity() {
 
     private fun confirmDelete(userId: String, userName: String) {
         AlertDialog.Builder(this)
-            .setTitle("Eliminar Usuario")
-            .setMessage("¿Estás seguro de que quieres borrar el acceso a '$userName'?")
-            .setPositiveButton("Borrar") { _, _ ->
+            .setTitle(R.string.dialog_delete_user_title)
+            .setMessage(getString(R.string.dialog_delete_user_message, userName))
+            .setPositiveButton(R.string.btn_delete) { _, _ ->
                 lifecycleScope.launch {
                     val success = authRepository.deleteUser(userId)
                     if (success) {
-                        Toast.makeText(this@AdminUsersActivity, "Usuario eliminado", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@AdminUsersActivity, R.string.msg_user_deleted, Toast.LENGTH_SHORT).show()
                         loadUsers()
                     } else {
-                        Toast.makeText(this@AdminUsersActivity, "Error al eliminar", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(this@AdminUsersActivity, R.string.msg_error_delete, Toast.LENGTH_SHORT).show()
                     }
                 }
             }
-            .setNegativeButton("Cancelar", null)
+            .setNegativeButton(R.string.btn_cancel, null)
             .show()
     }
 

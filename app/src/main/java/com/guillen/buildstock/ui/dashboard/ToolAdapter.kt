@@ -41,13 +41,13 @@ class ToolAdapter(
                 .into(ivToolImage)
 
             if (isDisponible) {
-                tvToolStatus.text = "Disponible"
+                tvToolStatus.text = context.getString(R.string.status_available)
                 tvToolStatus.setTextColor(ContextCompat.getColor(context, R.color.brand_green))
                 btnAddToCart.visibility = View.VISIBLE
                 btnAddToCart.isEnabled = true
             } else {
                 val statusText = if (tool.currentUserName.isNotEmpty()) {
-                    "En uso (${tool.currentUserName})"
+                    context.getString(R.string.status_in_use_format, tool.currentUserName)
                 } else {
                     tool.status.replaceFirstChar { it.uppercase() }
                 }
