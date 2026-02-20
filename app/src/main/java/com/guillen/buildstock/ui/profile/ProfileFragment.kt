@@ -16,14 +16,18 @@ import com.guillen.buildstock.ui.auth.LoginActivity
 import com.guillen.buildstock.ui.home.RecentMovementsActivity
 import kotlinx.coroutines.launch
 
+// Fragmento que muestra el perfil del usuario y opciones de cuenta
 class ProfileFragment : Fragment() {
 
+    // Enlace con la vista XML
     private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding!!
 
+    // Repositorios de datos
     private val authRepository = AuthRepository()
     private val inventoryRepository = InventoryRepository()
 
+    // Inflado de la vista
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -32,6 +36,7 @@ class ProfileFragment : Fragment() {
         return binding.root
     }
 
+    // Configuración inicial
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -39,6 +44,7 @@ class ProfileFragment : Fragment() {
         setupListeners()
     }
 
+    // Carga los datos del usuario y sus estadísticas
     private fun loadUserProfile() {
         viewLifecycleOwner.lifecycleScope.launch {
             val user = authRepository.getUserProfile()
@@ -49,7 +55,7 @@ class ProfileFragment : Fragment() {
                 binding.tvProfileRole.text = roleCapitalized + getString(R.string.suffix_plant_location)
                 binding.tvInitials.text = getInitials(user.name)
 
-                // LÓGICA DE ROLES ACTUALIZADA
+                // Control de visibilidad para opciones de administrador
                 if (user.role.lowercase() == "admin") {
                     binding.btnAdminPanel.visibility = View.VISIBLE
                     binding.btnRecentMovements.visibility = View.VISIBLE
@@ -71,13 +77,13 @@ class ProfileFragment : Fragment() {
         }
     }
 
+    // Configura los listeners de los botones
     private fun setupListeners() {
         binding.btnAdminPanel.setOnClickListener {
             val intent = Intent(requireContext(), com.guillen.buildstock.ui.admin.AdminPanelActivity::class.java)
             startActivity(intent)
         }
 
-        // NUEVO: Listener del botón de Últimos Movimientos
         binding.btnRecentMovements.setOnClickListener {
             val intent = Intent(requireContext(), RecentMovementsActivity::class.java)
             startActivity(intent)
@@ -91,6 +97,7 @@ class ProfileFragment : Fragment() {
         }
     }
 
+    // Genera las iniciales a partir del nombre completo
     private fun getInitials(fullName: String): String {
         val words = fullName.trim().split(" ")
         if (words.isEmpty()) return ""
@@ -99,6 +106,7 @@ class ProfileFragment : Fragment() {
         return firstInitial + secondInitial
     }
 
+    // Limpieza de la vista
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

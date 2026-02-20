@@ -12,13 +12,17 @@ import com.guillen.buildstock.data.repository.InventoryRepository
 import com.guillen.buildstock.databinding.FragmentHomeBinding
 import kotlinx.coroutines.launch
 
+// Fragmento principal de la aplicación con resumen y accesos directos
 class HomeFragment : Fragment() {
 
+    // Enlace con la vista XML
     private var _binding: FragmentHomeBinding? = null
     private val binding get() = _binding!!
 
+    // Repositorio de inventario
     private val repository = InventoryRepository()
 
+    // Inflado de la vista del fragmento
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -27,6 +31,7 @@ class HomeFragment : Fragment() {
         return binding.root
     }
 
+    // Configuración inicial de la vista una vez creada
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -34,18 +39,20 @@ class HomeFragment : Fragment() {
         loadStatistics()
     }
 
+    // Carga y muestra estadísticas del inventario
     private fun loadStatistics() {
         lifecycleScope.launch {
-            // Pedimos los conteos exactos a Firebase
+            // Solicita los conteos a la base de datos
             val availableCount = repository.getToolsCountByStatus("disponible")
             val inUseCount = repository.getToolsCountByStatus("en uso")
 
-            // Actualizamos la interfaz gráfica
+            // Actualiza los contadores en la interfaz
             binding.tvAvailableCount.text = availableCount.toString()
             binding.tvInUseCount.text = inUseCount.toString()
         }
     }
 
+    // Configura los listeners para las tarjetas de categorías y búsqueda
     private fun setupClickListeners() {
         binding.cardElectric.setOnClickListener {
             openCategory("Herramientas Eléctricas")
@@ -60,12 +67,13 @@ class HomeFragment : Fragment() {
         }
 
         binding.cvSearch.setOnClickListener {
-            // Abrimos el nuevo buscador
+            // Navega a la pantalla de búsqueda
             val intent = Intent(requireContext(), SearchActivity::class.java)
             startActivity(intent)
         }
     }
 
+    // Abre la actividad de detalle de categoría
     private fun openCategory(categoryName: String) {
         val intent = Intent(requireContext(), CategoryDetailActivity::class.java).apply {
             putExtra("CATEGORY_NAME", categoryName)
@@ -73,12 +81,13 @@ class HomeFragment : Fragment() {
         startActivity(intent)
     }
 
+    // Limpieza del binding al destruir la vista
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
 
-    // Refrescar los números si volvemos a esta pantalla
+    // Actualiza las estadísticas al volver al fragmento
     override fun onResume() {
         super.onResume()
         loadStatistics()

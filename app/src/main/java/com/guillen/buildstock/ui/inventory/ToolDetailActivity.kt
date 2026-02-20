@@ -19,11 +19,15 @@ import com.guillen.buildstock.ui.cart.CartManager
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
+// Actividad para mostrar los detalles completos de una herramienta
 class ToolDetailActivity : AppCompatActivity() {
 
+    // Enlace con la vista XML
     private lateinit var binding: ActivityToolDetailBinding
+    // Repositorio de inventario
     private val repository = InventoryRepository()
 
+    // Inicialización de la actividad
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityToolDetailBinding.inflate(layoutInflater)
@@ -42,6 +46,7 @@ class ToolDetailActivity : AppCompatActivity() {
         }
     }
 
+    // Carga la información detallada de la herramienta desde Firebase
     private fun loadToolDetails(id: String) {
         lifecycleScope.launch {
             val tool = repository.getToolById(id)
@@ -101,6 +106,7 @@ class ToolDetailActivity : AppCompatActivity() {
         }
     }
 
+    // Inicia una llamada telefónica al usuario que tiene la herramienta
     private fun callUser(userId: String) {
         lifecycleScope.launch {
             try {

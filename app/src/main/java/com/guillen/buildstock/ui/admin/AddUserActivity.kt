@@ -9,12 +9,17 @@ import com.guillen.buildstock.data.repository.AuthRepository
 import com.guillen.buildstock.databinding.ActivityAddUserBinding
 import kotlinx.coroutines.launch
 
+// Actividad para registrar nuevos usuarios o editar existentes
 class AddUserActivity : AppCompatActivity() {
 
+    // Enlace con la vista XML
     private lateinit var binding: ActivityAddUserBinding
+    // Repositorio de autenticación
     private val authRepository = AuthRepository()
+    // Email del usuario si se está en modo edición
     private var userEmailToEdit: String? = null
 
+    // Inicialización de componentes y listeners
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityAddUserBinding.inflate(layoutInflater)
@@ -31,6 +36,7 @@ class AddUserActivity : AppCompatActivity() {
         }
     }
 
+    // Verifica si la actividad se abrió para editar un usuario existente
     private fun checkForEditMode() {
         userEmailToEdit = intent.getStringExtra("USER_EMAIL")
 
@@ -55,6 +61,7 @@ class AddUserActivity : AppCompatActivity() {
         }
     }
 
+    // Valida los campos y guarda la información del usuario en Firebase
     private fun saveUserData() {
         val name = binding.etUserName.text.toString()
         val phone = binding.etUserPhone.text.toString()

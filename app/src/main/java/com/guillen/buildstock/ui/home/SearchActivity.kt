@@ -17,14 +17,20 @@ import com.guillen.buildstock.ui.inventory.ToolAdapter
 import com.guillen.buildstock.ui.inventory.ToolDetailActivity
 import kotlinx.coroutines.launch
 
+// Actividad para buscar herramientas en el inventario
 class SearchActivity : AppCompatActivity() {
 
+    // Enlace con la vista XML
     private lateinit var binding: ActivitySearchBinding
+    // Repositorio de inventario
     private val repository = InventoryRepository()
+    // Adaptador para mostrar resultados de búsqueda
     private lateinit var adapter: ToolAdapter
 
+    // Lista completa de herramientas para filtrado local
     private var allTools: List<Tool> = emptyList()
 
+    // Inicialización de la actividad
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivitySearchBinding.inflate(layoutInflater)
@@ -41,6 +47,7 @@ class SearchActivity : AppCompatActivity() {
         loadAllTools()
     }
 
+    // Configura el RecyclerView y sus acciones
     private fun setupRecyclerView() {
         adapter = ToolAdapter(
             tools = emptyList(),
@@ -63,6 +70,7 @@ class SearchActivity : AppCompatActivity() {
         binding.rvSearchResults.adapter = adapter
     }
 
+    // Configura el listener para cambios en el campo de texto
     private fun setupSearchListener() {
         binding.etSearchInput.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
@@ -74,6 +82,7 @@ class SearchActivity : AppCompatActivity() {
         })
     }
 
+    // Carga la lista completa de herramientas para permitir el filtrado
     private fun loadAllTools() {
         lifecycleScope.launch {
             allTools = repository.getToolsList()
@@ -81,6 +90,7 @@ class SearchActivity : AppCompatActivity() {
         }
     }
 
+    // Filtra la lista de herramientas según el texto ingresado
     private fun filterTools(query: String) {
         if (query.isEmpty()) {
             adapter.updateList(allTools)

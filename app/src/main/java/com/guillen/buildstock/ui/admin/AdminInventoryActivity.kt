@@ -12,12 +12,17 @@ import com.guillen.buildstock.data.repository.InventoryRepository
 import com.guillen.buildstock.databinding.ActivityAdminInventoryBinding
 import kotlinx.coroutines.launch
 
+// Pantalla principal de administración del inventario
 class AdminInventoryActivity : AppCompatActivity() {
 
+    // Enlace con la vista XML
     private lateinit var binding: ActivityAdminInventoryBinding
+    // Repositorio de inventario
     private val repository = InventoryRepository()
+    // Adaptador para la lista de herramientas
     private lateinit var adapter: AdminToolAdapter
 
+    // Configuración inicial de la actividad
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityAdminInventoryBinding.inflate(layoutInflater)
@@ -31,17 +36,20 @@ class AdminInventoryActivity : AppCompatActivity() {
         }
     }
 
+    // Recarga el inventario cada vez que la actividad se vuelve visible
     override fun onResume() {
         super.onResume()
         loadInventory()
     }
 
+    // Configura la barra de herramientas superior
     private fun setupToolbar() {
         setSupportActionBar(binding.toolbarAdminInv)
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
         binding.toolbarAdminInv.setNavigationOnClickListener { finish() }
     }
 
+    // Inicializa el RecyclerView y su adaptador con los callbacks de acción
     private fun setupRecyclerView() {
         adapter = AdminToolAdapter(
             tools = emptyList(),
@@ -59,6 +67,7 @@ class AdminInventoryActivity : AppCompatActivity() {
         binding.rvAdminTools.adapter = adapter
     }
 
+    // Obtiene la lista de herramientas desde el repositorio
     private fun loadInventory() {
         binding.progressBar.visibility = View.VISIBLE
         lifecycleScope.launch {
@@ -68,6 +77,7 @@ class AdminInventoryActivity : AppCompatActivity() {
         }
     }
 
+    // Elimina una herramienta seleccionada
     private fun deleteTool(id: String) {
         if (id.isEmpty()) return
         lifecycleScope.launch {

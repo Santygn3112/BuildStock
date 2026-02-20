@@ -7,19 +7,26 @@ import androidx.recyclerview.widget.RecyclerView
 import com.guillen.buildstock.R
 import com.guillen.buildstock.data.model.User
 import com.guillen.buildstock.databinding.ItemUserBinding
+
+// Adaptador para mostrar la lista de usuarios en el RecyclerView
 class UserAdapter(
     private var users: List<User>,
+    // Acción al pulsar editar
     private val onEditClick: (User) -> Unit,
+    // Acción al pulsar eliminar
     private val onDeleteClick: (User) -> Unit
 ) : RecyclerView.Adapter<UserAdapter.UserViewHolder>() {
 
+    // ViewHolder para el elemento de usuario
     class UserViewHolder(val binding: ItemUserBinding) : RecyclerView.ViewHolder(binding.root)
 
+    // Infla el layout del ítem de usuario
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserViewHolder {
         val binding = ItemUserBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return UserViewHolder(binding)
     }
 
+    // Asigna los datos del usuario a la vista
     override fun onBindViewHolder(holder: UserViewHolder, position: Int) {
         val user = users[position]
         val context = holder.itemView.context
@@ -42,8 +49,10 @@ class UserAdapter(
         }
     }
 
+    // Devuelve la cantidad de usuarios
     override fun getItemCount() = users.size
 
+    // Actualiza la lista de datos
     fun updateList(newList: List<User>) {
         this.users = newList
         notifyDataSetChanged()

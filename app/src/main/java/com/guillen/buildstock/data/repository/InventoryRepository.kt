@@ -8,11 +8,16 @@ import com.guillen.buildstock.data.model.Tool
 import kotlinx.coroutines.tasks.await
 import java.util.Calendar
 
+// Repositorio encargado de gestionar herramientas y movimientos en Firestore
 class InventoryRepository {
+    // Instancia principal de Firestore
     private val db = FirebaseFirestore.getInstance()
+    // Colección de herramientas
     private val toolsCollection = db.collection("tools")
+    // Colección de movimientos
     private val movementsCollection = db.collection("movements")
 
+    // Obtiene los detalles de una herramienta por su ID
     suspend fun getToolById(id: String): Tool? {
         return try {
             val snapshot = toolsCollection.document(id).get().await()
@@ -23,6 +28,7 @@ class InventoryRepository {
         }
     }
 
+    // Agrega una nueva herramienta a la base de datos
     suspend fun addTool(tool: Tool): Boolean {
         return try {
             val docRef = toolsCollection.add(tool).await()
@@ -34,6 +40,7 @@ class InventoryRepository {
         }
     }
 
+    // Actualiza los datos de una herramienta existente
     suspend fun updateTool(tool: Tool): Boolean {
         return try {
             if (tool.id.isEmpty()) return false
@@ -45,6 +52,7 @@ class InventoryRepository {
         }
     }
 
+    // Elimina una herramienta de la base de datos
     suspend fun deleteTool(id: String): Boolean {
         return try {
             if (id.isEmpty()) return false
@@ -56,7 +64,7 @@ class InventoryRepository {
         }
     }
 
-
+    // Cuenta las herramientas filtradas por su estado
     suspend fun getToolsCountByStatus(status: String): Int {
         return try {
             val snapshot = toolsCollection.whereEqualTo("status", status).get().await()
@@ -67,6 +75,7 @@ class InventoryRepository {
         }
     }
 
+    // Recupera la lista completa de herramientas
     suspend fun getToolsList(): List<Tool> {
         return try {
             val snapshot = toolsCollection.get().await()
@@ -77,6 +86,7 @@ class InventoryRepository {
         }
     }
 
+    // Filtra y obtiene herramientas por categoría
     suspend fun getToolsByCategory(category: String): List<Tool> {
         return try {
             val snapshot = toolsCollection.whereEqualTo("category", category).get().await()
@@ -87,6 +97,7 @@ class InventoryRepository {
         }
     }
 
+    // Obtiene las herramientas asignadas actualmente a un usuario
     suspend fun getToolsByUserId(userId: String): List<Tool> {
         return try {
             val snapshot = toolsCollection.whereEqualTo("currentUserId", userId).get().await()
@@ -97,6 +108,7 @@ class InventoryRepository {
         }
     }
 
+    // Calcula el número de movimientos realizados por un usuario en el día actual
     suspend fun getTodayUserMovementsCount(userId: String): Int {
         return try {
             val snapshot = movementsCollection
@@ -119,6 +131,7 @@ class InventoryRepository {
         }
     }
 
+    // Procesa la transacción de recogida de herramientas
     suspend fun processPickupTransaction(tools: List<Tool>, userId: String, userName: String): Boolean {
         if (userId.isEmpty()) {
             Log.e("FIREBASE_MONITOR", "Error: userId está vacío en la transacción")
@@ -165,6 +178,7 @@ class InventoryRepository {
         }
     }
 
+    // Procesa la transacción de devolución de herramientas
     suspend fun processReturnTransaction(tools: List<Tool>, userId: String, userName: String): Boolean {
         if (userId.isEmpty()) {
             Log.e("FIREBASE_MONITOR", "Error: userId está vacío en la transacción (devolución)")
@@ -212,6 +226,7 @@ class InventoryRepository {
         }
     }
 
+    // Obtiene los movimientos más recientes ordenados por fecha
     suspend fun getRecentMovements(limit: Long = 10): List<Movement> {
         return try {
             val snapshot = movementsCollection
