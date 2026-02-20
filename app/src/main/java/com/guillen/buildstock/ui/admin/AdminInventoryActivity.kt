@@ -2,6 +2,7 @@ package com.guillen.buildstock.ui.admin
 
 import android.content.Intent
 import android.os.Bundle
+import com.guillen.buildstock.R
 import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
