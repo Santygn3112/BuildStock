@@ -11,12 +11,17 @@ import com.guillen.buildstock.data.repository.AuthRepository
 import com.guillen.buildstock.databinding.ActivityAdminUsersBinding
 import kotlinx.coroutines.launch
 
+// Actividad para la gestión de usuarios (listar, añadir, editar, borrar)
 class AdminUsersActivity : AppCompatActivity() {
 
+    // Enlace con la vista XML
     private lateinit var binding: ActivityAdminUsersBinding
+    // Repositorio de autenticación
     private val authRepository = AuthRepository()
+    // Adaptador para la lista de usuarios
     private lateinit var adapter: UserAdapter
 
+    // Inicialización de la actividad
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityAdminUsersBinding.inflate(layoutInflater)
@@ -33,6 +38,7 @@ class AdminUsersActivity : AppCompatActivity() {
         loadUsers()
     }
 
+    // Configura el RecyclerView y define los callbacks de interacción
     private fun setupRecyclerView() {
         adapter = UserAdapter(
             users = emptyList(),
@@ -52,6 +58,7 @@ class AdminUsersActivity : AppCompatActivity() {
         binding.rvAdminUsers.adapter = adapter
     }
 
+    // Muestra un diálogo de confirmación antes de eliminar un usuario
     private fun confirmDelete(userId: String, userName: String) {
         AlertDialog.Builder(this)
             .setTitle(R.string.dialog_delete_user_title)
@@ -71,6 +78,7 @@ class AdminUsersActivity : AppCompatActivity() {
             .show()
     }
 
+    // Carga la lista de usuarios desde el repositorio
     private fun loadUsers() {
         lifecycleScope.launch {
             val users = authRepository.getAllUsers()
@@ -78,6 +86,7 @@ class AdminUsersActivity : AppCompatActivity() {
         }
     }
 
+    // Recarga la lista de usuarios al volver a la actividad
     override fun onResume() {
         super.onResume()
         loadUsers()

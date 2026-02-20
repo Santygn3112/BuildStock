@@ -7,11 +7,16 @@ import com.google.firebase.firestore.FirebaseFirestore
 import kotlinx.coroutines.tasks.await
 import com.guillen.buildstock.data.model.User
 
+// Repositorio encargado de la autenticación y gestión de usuarios
 class AuthRepository {
 
+    // Instancia de Firestore para acceder a la base de datos
     private val db = FirebaseFirestore.getInstance()
+
+    // Instancia de FirebaseAuth para la gestión de sesiones
     private val auth = FirebaseAuth.getInstance()
 
+    // Inicia sesión con correo y contraseña
     suspend fun login(email: String, password: String): Boolean {
         return try {
             auth.signInWithEmailAndPassword(email, password).await()
@@ -22,6 +27,7 @@ class AuthRepository {
         }
     }
 
+    // Obtiene el perfil del usuario actual autenticado
     suspend fun getUserProfile(): User? {
         return try {
             val uid = auth.currentUser?.uid ?: return null
@@ -33,6 +39,7 @@ class AuthRepository {
         }
     }
 
+    // Recupera la lista completa de usuarios registrados
     suspend fun getAllUsers(): List<User> {
         return try {
             val snapshot = db.collection("users").get().await()
@@ -43,6 +50,7 @@ class AuthRepository {
         }
     }
 
+    // Registra un nuevo usuario con privilegios de administrador utilizando una app secundaria
     suspend fun registerUserAsAdmin(context: Context, name: String, email: String, password: String, role: String, phone: String): Boolean {
         return try {
             val defaultApp = FirebaseApp.getInstance()
@@ -77,6 +85,7 @@ class AuthRepository {
         }
     }
 
+    // Actualiza los datos del perfil de un usuario existente
     suspend fun updateUserProfile(email: String, newName: String, newRole: String, newPhone: String): Boolean {
         return try {
             val snapshot = db.collection("users").whereEqualTo("email", email).get().await()
@@ -99,6 +108,7 @@ class AuthRepository {
         }
     }
 
+    // Elimina un usuario de la base de datos por su correo electrónico
     suspend fun deleteUser(userEmail: String): Boolean {
         return try {
             val snapshot = db.collection("users").whereEqualTo("email", userEmail).get().await()
@@ -115,6 +125,7 @@ class AuthRepository {
         }
     }
 
+    // Cierra la sesión del usuario actual
     fun signOut() {
         auth.signOut()
     }

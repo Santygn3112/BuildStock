@@ -11,16 +11,22 @@ import com.guillen.buildstock.data.repository.InventoryRepository
 import com.guillen.buildstock.databinding.ActivityAddToolBinding
 import kotlinx.coroutines.launch
 
+// Actividad para añadir o editar herramientas en el inventario
 class AddToolActivity : AppCompatActivity() {
 
+    // Enlace con la vista XML
     private lateinit var binding: ActivityAddToolBinding
+    // Repositorio para operaciones de base de datos
     private val repository = InventoryRepository()
+    // Identificador de la herramienta si se está editando
     private var toolId: String? = null
 
+    // Variables para mantener el estado actual de la herramienta
     private var currentStatus: String = "disponible"
     private var currentUserId: String = ""
     private var currentUserName: String = ""
 
+    // Inicialización de la actividad y configuración de la interfaz
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityAddToolBinding.inflate(layoutInflater)
@@ -33,6 +39,7 @@ class AddToolActivity : AppCompatActivity() {
         toolId = intent.getStringExtra("TOOL_ID")
         setupSpinner()
 
+        // Configura la interfaz para edición si existe un ID
         if (toolId != null) {
             binding.toolbarAddTool.setTitle(R.string.title_edit_tool)
             binding.btnSaveTool.setText(R.string.btn_update_data)
@@ -44,6 +51,7 @@ class AddToolActivity : AppCompatActivity() {
         }
     }
 
+    // Configura el selector de categorías
     private fun setupSpinner() {
         val categories = resources.getStringArray(R.array.tool_categories)
         val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, categories)
@@ -51,6 +59,7 @@ class AddToolActivity : AppCompatActivity() {
         binding.spinnerCategory.adapter = adapter
     }
 
+    // Carga los datos existentes de una herramienta para su edición
     private fun loadToolData(id: String) {
         lifecycleScope.launch {
             val tool = repository.getToolById(id)
@@ -73,6 +82,7 @@ class AddToolActivity : AppCompatActivity() {
         }
     }
 
+    // Guarda o actualiza la herramienta en la base de datos
     private fun saveTool() {
         val name = binding.etName.text.toString().trim()
         val brandModel = binding.etBrandModel.text.toString().trim()

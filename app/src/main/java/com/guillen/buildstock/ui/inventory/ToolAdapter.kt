@@ -10,19 +10,25 @@ import com.guillen.buildstock.R
 import com.guillen.buildstock.data.model.Tool
 import com.guillen.buildstock.databinding.ItemToolBinding
 
+// Adaptador para mostrar la lista de herramientas en la UI
 class ToolAdapter(
     private var tools: List<Tool>,
+    // Acción al pulsar sobre una herramienta
     private val onItemClick: (Tool) -> Unit,
+    // Acción al añadir al carrito
     private val onAddToCartClick: (Tool) -> Unit
 ) : RecyclerView.Adapter<ToolAdapter.ToolViewHolder>() {
 
+    // ViewHolder para el elemento de herramienta
     class ToolViewHolder(val binding: ItemToolBinding) : RecyclerView.ViewHolder(binding.root)
 
+    // Crea la vista para cada elemento
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ToolViewHolder {
         val binding = ItemToolBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return ToolViewHolder(binding)
     }
 
+    // Vincula los datos de la herramienta con la vista
     override fun onBindViewHolder(holder: ToolViewHolder, position: Int) {
         val tool = tools[position]
         val context = holder.itemView.context
@@ -33,13 +39,15 @@ class ToolAdapter(
 
             val isDisponible = tool.status.lowercase() == "disponible"
 
-            com.bumptech.glide.Glide.with(context)
+            // Carga la imagen de la herramienta usando Glide
+            Glide.with(context)
                 .load(tool.imageUrl)
                 .placeholder(android.R.drawable.ic_menu_gallery)
                 .error(android.R.drawable.ic_menu_report_image)
                 .centerCrop()
                 .into(ivToolImage)
 
+            // Configura el estado visual y la disponibilidad del botón de añadir
             if (isDisponible) {
                 tvToolStatus.text = context.getString(R.string.status_available)
                 tvToolStatus.setTextColor(ContextCompat.getColor(context, R.color.brand_green))
@@ -68,8 +76,10 @@ class ToolAdapter(
         }
     }
 
+    // Devuelve el número de herramientas
     override fun getItemCount() = tools.size
 
+    // Actualiza la lista de datos
     fun updateList(newList: List<Tool>) {
         this.tools = newList
         notifyDataSetChanged()

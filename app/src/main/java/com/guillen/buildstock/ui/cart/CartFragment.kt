@@ -16,23 +16,30 @@ import com.guillen.buildstock.data.repository.InventoryRepository
 import com.guillen.buildstock.databinding.FragmentCartBinding
 import kotlinx.coroutines.launch
 
+// Fragmento que gestiona el carrito para recogidas y devoluciones
 class CartFragment : Fragment() {
 
+    // Enlace con la vista XML
     private var _binding: FragmentCartBinding? = null
     private val binding get() = _binding!!
 
+    // Repositorios necesarios
     private val inventoryRepository = InventoryRepository()
     private val authRepository = AuthRepository()
     private lateinit var cartAdapter: CartAdapter
 
+    // Estado de la transacción (Recogida o Devolución)
     private var isRecogida = true
+    // Lista local de herramientas para devolver
     private var toolsToReturn: MutableList<Tool> = mutableListOf()
 
+    // Inflado de la vista
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
         _binding = FragmentCartBinding.inflate(inflater, container, false)
         return binding.root
     }
 
+    // Configuración inicial de la vista
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         setupRecyclerView()
@@ -40,6 +47,7 @@ class CartFragment : Fragment() {
         loadPickupItems()
     }
 
+    // Configura los botones para alternar entre Recogida y Devolución
     private fun setupToggleButtons() {
         binding.toggleTransactionType.addOnButtonCheckedListener { _, checkedId, isChecked ->
             if (isChecked) {
@@ -57,6 +65,7 @@ class CartFragment : Fragment() {
         }
     }
 
+    // Carga los ítems almacenados en el gestor de carrito (Recogida)
     private fun loadPickupItems() {
         CartManager.cartItems.observe(viewLifecycleOwner) { items ->
             if (isRecogida) {
@@ -66,6 +75,7 @@ class CartFragment : Fragment() {
         }
     }
 
+    // Carga las herramientas que el usuario tiene en su poder (Devolución)
     private fun loadReturnItems() {
         viewLifecycleOwner.lifecycleScope.launch {
             val currentUser = authRepository.getUserProfile()
@@ -83,6 +93,7 @@ class CartFragment : Fragment() {
         }
     }
 
+    // Procesa la transacción final en la base de datos
     private fun confirmTransaction() {
         viewLifecycleOwner.lifecycleScope.launch {
             binding.btnConfirmTransaction.isEnabled = false
@@ -126,6 +137,7 @@ class CartFragment : Fragment() {
         }
     }
 
+    // Inicializa el RecyclerView
     private fun setupRecyclerView() {
         cartAdapter = CartAdapter(
             tools = emptyList(),
@@ -145,10 +157,12 @@ class CartFragment : Fragment() {
         binding.btnConfirmTransaction.setOnClickListener { confirmTransaction() }
     }
 
+    // Actualiza el contador total de ítems en la vista
     private fun updateTotals(count: Int) {
         binding.tvTotalItems.text = count.toString()
     }
 
+    // Limpieza al destruir la vista
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null

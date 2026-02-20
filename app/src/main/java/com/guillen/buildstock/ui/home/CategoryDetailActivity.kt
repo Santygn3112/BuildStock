@@ -13,12 +13,17 @@ import com.guillen.buildstock.ui.inventory.ToolAdapter
 import com.guillen.buildstock.ui.inventory.ToolDetailActivity
 import kotlinx.coroutines.launch
 
+// Actividad para mostrar las herramientas de una categoría específica
 class CategoryDetailActivity : AppCompatActivity() {
 
+    // Enlace con la vista XML
     private lateinit var binding: ActivityCategoryDetailBinding
+    // Repositorio de inventario
     private val repository = InventoryRepository()
+    // Adaptador para mostrar la lista de herramientas
     private lateinit var adapter: ToolAdapter
 
+    // Inicialización de la actividad
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityCategoryDetailBinding.inflate(layoutInflater)
@@ -31,6 +36,7 @@ class CategoryDetailActivity : AppCompatActivity() {
         loadTools(categoryName)
     }
 
+    // Configura la barra de herramientas con el nombre de la categoría
     private fun setupToolbar(categoryName: String) {
         binding.toolbarCategory.title = categoryName
         binding.toolbarCategory.setNavigationIcon(R.drawable.baseline_arrow_back_ios_new_24)
@@ -39,6 +45,7 @@ class CategoryDetailActivity : AppCompatActivity() {
         }
     }
 
+    // Inicializa el RecyclerView y define las acciones de los elementos
     private fun setupRecyclerView() {
         adapter = ToolAdapter(
             tools = emptyList(),
@@ -60,6 +67,7 @@ class CategoryDetailActivity : AppCompatActivity() {
         binding.rvCategoryTools.adapter = adapter
     }
 
+    // Carga las herramientas correspondientes a la categoría seleccionada
     private fun loadTools(categoryName: String) {
         lifecycleScope.launch {
             val tools = repository.getToolsByCategory(categoryName)

@@ -13,17 +13,21 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+// Adaptador para visualizar el historial de movimientos de herramientas
 class MovementAdapter(
     private var movements: List<Movement>
 ) : RecyclerView.Adapter<MovementAdapter.MovementViewHolder>() {
 
+    // ViewHolder que contiene la vista de un movimiento individual
     class MovementViewHolder(val binding: ItemMovementBinding) : RecyclerView.ViewHolder(binding.root)
 
+    // Crea la vista para cada elemento de la lista
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MovementViewHolder {
         val binding = ItemMovementBinding.inflate(LayoutInflater.from(parent.context), parent, false)
         return MovementViewHolder(binding)
     }
 
+    // Asigna los datos del movimiento a la vista
     override fun onBindViewHolder(holder: MovementViewHolder, position: Int) {
         val movement = movements[position]
         val context = holder.itemView.context
@@ -41,8 +45,10 @@ class MovementAdapter(
         }
     }
 
+    // Devuelve el número total de movimientos
     override fun getItemCount() = movements.size
 
+    // Actualiza la lista de movimientos y refresca la vista
     fun updateList(newList: List<Movement>) {
         this.movements = newList
         notifyDataSetChanged()
