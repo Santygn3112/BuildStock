@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.guillen.buildstock.R
 import com.guillen.buildstock.data.model.User
 import com.guillen.buildstock.data.repository.AuthRepository
 import kotlinx.coroutines.launch
@@ -18,8 +19,8 @@ class LoginViewModel : ViewModel() {
     private val _isLoading = MutableLiveData<Boolean>()
     val isLoading: LiveData<Boolean> = _isLoading
 
-    private val _errorMessage = MutableLiveData<String?>()
-    val errorMessage: LiveData<String?> = _errorMessage
+    private val _errorMessage = MutableLiveData<Int?>()
+    val errorMessage: LiveData<Int?> = _errorMessage
 
     private val _userProfile = MutableLiveData<User?>()
     val userProfile: LiveData<User?> = _userProfile
@@ -39,11 +40,11 @@ class LoginViewModel : ViewModel() {
                 } else {
                     authRepository.signOut()
                     _loginStatus.value = false
-                    _errorMessage.value = "Usuario no encontrado o acceso revocado"
+                    _errorMessage.value = R.string.login_error_user_not_found
                 }
             } else {
                 _loginStatus.value = false
-                _errorMessage.value = "Correo o contraseña incorrectos"
+                _errorMessage.value = R.string.login_error_credentials
             }
             _isLoading.value = false
         }

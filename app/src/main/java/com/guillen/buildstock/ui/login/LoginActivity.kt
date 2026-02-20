@@ -37,7 +37,7 @@ class LoginActivity : AppCompatActivity() {
     private fun setupObservers() {
         viewModel.loginStatus.observe(this) { success ->
             if (success) {
-                Toast.makeText(this, "Login OK, verificando perfil...", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, R.string.login_success_verifying, Toast.LENGTH_SHORT).show()
                 val intent = Intent(this, MainActivity::class.java)
                 startActivity(intent)
                 finish()

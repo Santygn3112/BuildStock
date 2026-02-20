@@ -24,7 +24,7 @@ class CategoryDetailActivity : AppCompatActivity() {
         binding = ActivityCategoryDetailBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        val categoryName = intent.getStringExtra("CATEGORY_NAME") ?: "Sin Categoría"
+        val categoryName = intent.getStringExtra("CATEGORY_NAME") ?: getString(R.string.title_no_category)
 
         setupToolbar(categoryName)
         setupRecyclerView()
@@ -51,9 +51,9 @@ class CategoryDetailActivity : AppCompatActivity() {
             onAddToCartClick = { tool ->
                 if (tool.status.lowercase() == "disponible") {
                     CartManager.addTool(tool)
-                    Toast.makeText(this, "Añadido al carrito: ${tool.name}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, getString(R.string.msg_added_to_cart_format, tool.name), Toast.LENGTH_SHORT).show()
                 } else {
-                    Toast.makeText(this, "Esta herramienta no está disponible actualmente", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, R.string.msg_tool_not_available, Toast.LENGTH_SHORT).show()
                 }
             }
         )
@@ -64,7 +64,7 @@ class CategoryDetailActivity : AppCompatActivity() {
         lifecycleScope.launch {
             val tools = repository.getToolsByCategory(categoryName)
             adapter.updateList(tools)
-            binding.toolbarCategory.subtitle = "${tools.size} elementos"
+            binding.toolbarCategory.subtitle = getString(R.string.subtitle_elements_count, tools.size)
         }
     }
 }

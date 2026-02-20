@@ -34,8 +34,8 @@ class AddToolActivity : AppCompatActivity() {
         setupSpinner()
 
         if (toolId != null) {
-            binding.toolbarAddTool.title = "Editar Herramienta"
-            binding.btnSaveTool.text = "ACTUALIZAR DATOS"
+            binding.toolbarAddTool.setTitle(R.string.title_edit_tool)
+            binding.btnSaveTool.setText(R.string.btn_update_data)
             loadToolData(toolId!!)
         }
 
@@ -81,7 +81,7 @@ class AddToolActivity : AppCompatActivity() {
         val description = binding.etDescription.text.toString().trim()
 
         if (name.isEmpty()) {
-            binding.etName.error = "El nombre es obligatorio"
+            binding.etName.error = getString(R.string.error_name_required)
             return
         }
 
@@ -106,10 +106,10 @@ class AddToolActivity : AppCompatActivity() {
             }
 
             if (success) {
-                Toast.makeText(this@AddToolActivity, "Herramienta guardada con éxito", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@AddToolActivity, R.string.msg_tool_saved, Toast.LENGTH_SHORT).show()
                 finish()
             } else {
-                Toast.makeText(this@AddToolActivity, "Error al guardar en Firebase", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this@AddToolActivity, R.string.error_firebase_save, Toast.LENGTH_SHORT).show()
                 binding.btnSaveTool.isEnabled = true
             }
         }

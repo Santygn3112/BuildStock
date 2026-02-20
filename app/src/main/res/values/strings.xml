@@ -48,4 +48,61 @@
     <string name="admin_menu_users_desc">Ver operarios, roles y estado de cuentas</string>
     <string name="fab_add_tool">Añadir</string>
     <string name="ultimos_movimientos">ÚLTIMOS MOVIMIENTOS</string>
+
+    <!-- Login & Auth -->
+    <string name="login_success_verifying">Login OK, verificando perfil...</string>
+    <string name="login_error_credentials">Correo o contraseña incorrectos</string>
+    <string name="login_error_user_not_found">Usuario no encontrado o acceso revocado</string>
+    <string name="error_verify_identity">Error: No se pudo verificar tu identidad.</string>
+    <string name="msg_login_again">Inicia sesión de nuevo.</string>
+
+    <!-- Admin Users -->
+    <string name="dialog_delete_user_title">Eliminar Usuario</string>
+    <string name="dialog_delete_user_message">¿Estás seguro de que quieres borrar el acceso a \'%1$s\'?</string>
+    <string name="btn_delete">Borrar</string>
+    <string name="btn_cancel">Cancelar</string>
+    <string name="msg_user_deleted">Usuario eliminado</string>
+    <string name="msg_error_delete">Error al eliminar</string>
+    <string name="title_edit_user">Editar Usuario</string>
+    <string name="btn_update_user">ACTUALIZAR USUARIO</string>
+    <string name="hint_password_locked">No modificable por seguridad</string>
+    <string name="error_name_required">El nombre es obligatorio</string>
+    <string name="msg_processing">Procesando...</string>
+    <string name="msg_user_updated">Usuario actualizado correctamente</string>
+    <string name="error_db_update">Error al actualizar en la base de datos</string>
+    <string name="error_email_password_req">El correo es obligatorio y la clave debe tener 6 caracteres</string>
+    <string name="msg_user_created">Usuario creado con éxito</string>
+    <string name="error_user_creation">Error al crear: revisa si el correo ya existe</string>
+
+    <!-- Admin Inventory -->
+    <string name="msg_tool_deleted">Herramienta eliminada</string>
+    <string name="title_edit_tool">Editar Herramienta</string>
+    <string name="btn_update_data">ACTUALIZAR DATOS</string>
+    <string name="msg_tool_saved">Herramienta guardada con éxito</string>
+    <string name="error_firebase_save">Error al guardar en Firebase</string>
+
+    <!-- User Profile & Common -->
+    <string name="suffix_plant_location"> — Planta 2</string>
+    <string name="msg_no_phone">El operario no tiene teléfono.</string>
+    <string name="error_connection">Error al conectar.</string>
+
+    <!-- Categories & Tools -->
+    <string name="title_no_category">Sin Categoría</string>
+    <string name="subtitle_elements_count">%1$d elementos</string>
+    <string name="msg_added_to_cart_format">Añadido al carrito: %1$s</string>
+    <string name="msg_added_to_cart_simple">Añadida al carrito</string>
+    <string name="msg_tool_not_available">Esta herramienta no está disponible actualmente</string>
+    <string name="msg_tool_not_available_short">Esta herramienta no está disponible</string>
+    <string name="status_in_use_format">En uso (%1$s)</string>
+    <string name="status_in_use_by_format">En uso por %1$s</string>
+    <string name="detail_brand_model_format">Marca/Modelo: %1$s</string>
+
+    <!-- Cart -->
+    <string name="label_pickup">RECOGIDA</string>
+    <string name="label_return">DEVOLUCIÓN</string>
+    <string name="error_user_id_empty">Error crítico: ID de usuario vacío. Revisa User.kt</string>
+    <string name="msg_cart_empty">El carrito está vacío.</string>
+    <string name="msg_no_tools_return">No hay herramientas para devolver.</string>
+    <string name="msg_transaction_success">¡Transacción exitosa!</string>
+    <string name="error_process_transaction">Error al procesar. Revisa Logcat.</string>
 </resources>

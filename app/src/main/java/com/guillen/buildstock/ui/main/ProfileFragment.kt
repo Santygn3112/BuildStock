@@ -44,7 +44,7 @@ class ProfileFragment : Fragment() {
                 binding.tvProfileName.text = user.name
 
                 val roleCapitalized = user.role.replaceFirstChar { it.uppercase() }
-                binding.tvProfileRole.text = "$roleCapitalized — Planta 2"
+                binding.tvProfileRole.text = roleCapitalized + getString(R.string.suffix_plant_location)
                 binding.tvInitials.text = getInitials(user.name)
 
                 // LÓGICA DE ROLES ACTUALIZADA

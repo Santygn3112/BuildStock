@@ -52,9 +52,9 @@ class SearchActivity : AppCompatActivity() {
             onAddToCartClick = { tool ->
                 if (tool.status.lowercase() == "disponible") {
                     CartManager.addTool(tool)
-                    Toast.makeText(this, "Añadido al carrito: ${tool.name}", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, getString(R.string.msg_added_to_cart_format, tool.name), Toast.LENGTH_SHORT).show()
                 } else {
-                    Toast.makeText(this, "Esta herramienta no está disponible", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(this, R.string.msg_tool_not_available_short, Toast.LENGTH_SHORT).show()
                 }
             }
         )
