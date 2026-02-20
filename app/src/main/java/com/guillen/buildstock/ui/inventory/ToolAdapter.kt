@@ -1,4 +1,4 @@
-package com.guillen.buildstock.ui.dashboard
+package com.guillen.buildstock.ui.inventory
 
 import android.view.LayoutInflater
 import android.view.View

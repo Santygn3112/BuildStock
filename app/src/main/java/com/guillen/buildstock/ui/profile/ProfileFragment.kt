@@ -1,4 +1,4 @@
-package com.guillen.buildstock.ui.main
+package com.guillen.buildstock.ui.profile
 
 import android.content.Intent
 import android.os.Bundle
@@ -11,7 +11,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.guillen.buildstock.data.repository.AuthRepository
 import com.guillen.buildstock.data.repository.InventoryRepository
 import com.guillen.buildstock.databinding.FragmentProfileBinding
-import com.guillen.buildstock.ui.login.LoginActivity
+import com.guillen.buildstock.ui.auth.LoginActivity
+import com.guillen.buildstock.ui.home.RecentMovementsActivity
 import kotlinx.coroutines.launch
 
 class ProfileFragment : Fragment() {

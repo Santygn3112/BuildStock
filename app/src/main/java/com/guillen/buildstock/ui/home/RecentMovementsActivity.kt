@@ -1,4 +1,4 @@
-package com.guillen.buildstock.ui.main
+package com.guillen.buildstock.ui.home
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity

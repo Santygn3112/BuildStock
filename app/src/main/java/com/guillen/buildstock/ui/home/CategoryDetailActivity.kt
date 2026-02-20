@@ -1,4 +1,4 @@
-package com.guillen.buildstock.ui.main
+package com.guillen.buildstock.ui.home
 
 import android.content.Intent
 import android.os.Bundle
@@ -9,8 +9,8 @@ import com.guillen.buildstock.R
 import com.guillen.buildstock.data.repository.InventoryRepository
 import com.guillen.buildstock.databinding.ActivityCategoryDetailBinding
 import com.guillen.buildstock.ui.cart.CartManager
-import com.guillen.buildstock.ui.dashboard.ToolAdapter
-import com.guillen.buildstock.ui.detail.ToolDetailActivity
+import com.guillen.buildstock.ui.inventory.ToolAdapter
+import com.guillen.buildstock.ui.inventory.ToolDetailActivity
 import kotlinx.coroutines.launch
 
 class CategoryDetailActivity : AppCompatActivity() {
