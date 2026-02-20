@@ -2,6 +2,7 @@ package com.guillen.buildstock.ui.home
 
 import android.content.Intent
 import android.os.Bundle
+import com.guillen.buildstock.R
 import android.text.Editable
 import android.text.TextWatcher
 import android.widget.Toast
